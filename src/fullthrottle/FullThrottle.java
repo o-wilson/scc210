@@ -69,7 +69,11 @@ public class FullThrottle {
         // settingsS.setPosition(10, 10);
 
         Sprite settingsS = new Sprite(settingsT);
-        Button settingsButton = new Button(new Vector2f(10, 10), new Vector2i(64, 64), "", settingsS, Button.SpriteFillMode.STRETCH);
+        Button settingsButton = new Button(
+            new Vector2f(10, 10), new Vector2i(64, 64),
+            "", settingsS,
+            UI.SpriteFillMode.STRETCH
+        );
         settingsButton.setAction(this, "settings");
         drawables.add(settingsButton);
         buttonManager.addObserver(settingsButton);
