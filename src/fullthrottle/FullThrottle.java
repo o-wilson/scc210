@@ -2,6 +2,7 @@ package fullthrottle;
 
 import fullthrottle.gfx.*;
 import fullthrottle.ui.*;
+import fullthrottle.ui.Button.ActionType;
 
 import org.jsfml.graphics.*;
 
@@ -68,7 +69,7 @@ public class FullThrottle {
             new Vector2f(10, 10), new Vector2i(64, 64),
             settingsS, UI.SpriteFillMode.STRETCH
         );
-        settingsButton.setAction(this, "settings");
+        settingsButton.addAction(this, "settings", ActionType.LEFT_CLICK);
         drawables.add(settingsButton);
         buttonManager.addObserver(settingsButton);
 
@@ -77,7 +78,7 @@ public class FullThrottle {
         );
         float playButtonX = (WINDOW_WIDTH - playButton.getWidth()) /2;
         playButton.setPosition(playButtonX, 400);
-        playButton.setAction(this, "play");
+        playButton.addAction(this, "play", ActionType.LEFT_CLICK);
         drawables.add(playButton);
         buttonManager.addObserver(playButton);
     }

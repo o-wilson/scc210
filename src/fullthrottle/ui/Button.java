@@ -9,6 +9,8 @@ import java.lang.Class;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observer;
 import java.util.Observable;
 
@@ -44,11 +46,47 @@ public class Button implements Observer, Drawable {
     private Sprite drawnSprite;
     private UI.SpriteFillMode fillMode;
 
-    private Object actionObject;
-    private Method clickAction;
+    private class ButtonAction {
+        public Object actionObject;
+        public Method actionMethod;
+        public ActionType actionType;
+
+        public ButtonAction(Object o, Method m, ActionType t) {
+            actionObject = o;
+            actionMethod = m;
+            actionType = t;
+        }
+
+        public void execute() {
+            if (actionMethod != null && actionObject != null) {
+                try {
+                    actionMethod.invoke(actionObject);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        public boolean isType(ActionType t) {
+            return t == actionType;
+        }
+    }
+
+    private List<ButtonAction> actions;
+
+    public enum ActionType {
+        LEFT_CLICK,
+        RIGHT_CLICK,
+        ENTER,
+        EXIT
+    }
 
     private boolean hovered;
-    private boolean held;
+    private boolean lastHovered;
+    private boolean heldLeft;
+    private boolean heldRight;
     
     /**
      * Basic button with default UI sprite
@@ -87,8 +125,12 @@ public class Button implements Observer, Drawable {
         this.sourceSprite = sprite;
         this.drawnSprite = UI.generateFillSprite(sprite, this.size, this.fillMode);
 
-        held = false;
+        heldLeft = false;
+        heldRight = false;
         hovered = false;
+        lastHovered = false;
+
+        actions = new ArrayList<ButtonAction>();
     }
 
     /**
@@ -111,24 +153,27 @@ public class Button implements Observer, Drawable {
     }
 
     /**
-     * Attempts to set the button's action to a method on an object
-     * @param object Instance with the method
-     * @param method Action to perform when button clicked
+     * Attempts to add a new action to the button
+     * @param o Instance with the method
+     * @param m Action to perform on trigger
+     * @param t Type of the action (trigger)
      * @return true if successful, false otherwise
      */
-    public boolean setAction(Object object, String method) {
-        Class<?> c = object.getClass();
-        this.actionObject = object;
-        Method m = null;
+    public boolean addAction(Object o, String m, ActionType t) {
+        Class<?> c = o.getClass();
+        Method method = null;
         try {
-            m = c.getMethod(method);
+            method = c.getMethod(m);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
 
-        this.clickAction = m;
+        if (method == null) return false;
 
-        return (m != null);
+        ButtonAction a = new ButtonAction(o, method, t);
+        actions.add(a);
+
+        return true;
     }
 
     public void setPosition(float x, float y) {
@@ -178,13 +223,18 @@ public class Button implements Observer, Drawable {
     public void update(Observable o, Object event) {
         Event e = (Event)event;
         Vector2i mPos = Mouse.getPosition(FullThrottle.getWindow());
+        MouseButtonEvent mBEvent;
 
         if (e.type == Event.Type.MOUSE_BUTTON_RELEASED) {
-            if (held && containsPoint(mPos)) {
-                actionTriggered();
-            }
-
-            held = false;
+            mBEvent = e.asMouseButtonEvent();
+            if (containsPoint(mPos) && (heldLeft || heldRight))
+                if (mBEvent.button == Mouse.Button.LEFT && heldLeft) {
+                    heldLeft = false;
+                    actionTriggered(ActionType.LEFT_CLICK);
+                } else if (mBEvent.button == Mouse.Button.RIGHT && heldRight) {
+                    heldRight = false;
+                    actionTriggered(ActionType.RIGHT_CLICK);
+                }
         }
 
         if (e.type == Event.Type.MOUSE_MOVED) {
@@ -193,14 +243,24 @@ public class Button implements Observer, Drawable {
             } else {
                 hovered = false;
             }
+
+            if (hovered && !lastHovered)
+                actionTriggered(ActionType.ENTER);
+
+            if (!hovered && lastHovered)
+                actionTriggered(ActionType.EXIT);
+
+            lastHovered = hovered;
         }
         
         if (e.type == Event.Type.MOUSE_BUTTON_PRESSED) {
-            MouseButtonEvent mouseEvent = e.asMouseButtonEvent();
-            if (mouseEvent.button == Mouse.Button.LEFT) {
-                if (containsPoint(mPos))
-                    held = true;
-            }
+            mBEvent = e.asMouseButtonEvent();
+            if (containsPoint(mPos))
+                if (mBEvent.button == Mouse.Button.LEFT) {
+                    heldLeft = true;
+                } else if (mBEvent.button == Mouse.Button.RIGHT) {
+                    heldRight = true;
+                }
         }
     }
 
@@ -208,14 +268,10 @@ public class Button implements Observer, Drawable {
      * Called when the button is clicked (pressed and released)
      * Attempts to invoke the button's action
      */
-    public void actionTriggered() {
-        if (clickAction != null && actionObject != null) {
-            try {
-                clickAction.invoke(actionObject);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
+    public void actionTriggered(ActionType t) {
+        for (ButtonAction a : actions) {
+            if (a.isType(t)) {
+                a.execute();
             }
         }
     }
@@ -224,7 +280,7 @@ public class Button implements Observer, Drawable {
     public void draw(RenderTarget target, RenderStates states) {
         this.drawnSprite.setPosition(this.position);
         
-        if (held) {
+        if (heldLeft || heldRight) {
             this.drawnSprite.setColor(new Color(100, 100, 100));
         } else if (hovered) {
             this.drawnSprite.setColor(new Color(200, 200, 200));
