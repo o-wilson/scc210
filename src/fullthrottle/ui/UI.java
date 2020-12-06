@@ -1,13 +1,18 @@
 package fullthrottle.ui;
 
+import fullthrottle.gfx.FTTexture;
+import fullthrottle.gfx.FTFont;
+
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
 import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.Image;
 import org.jsfml.graphics.FloatRect;
+import org.jsfml.graphics.Font;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.TextureCreationException;
@@ -17,6 +22,14 @@ import org.jsfml.system.Vector2f;
 
 public final class UI {
     
+    public static Sprite DEFAULT_UI_SPRITE = new Sprite(
+        new FTTexture("./res/Button.png")
+    );
+
+    public static Font DEFAULT_UI_FONT = new FTFont(
+        "./res/FreeSans.ttf"
+    );
+
     /**
      * Modes for displaying the button's sprite
      */

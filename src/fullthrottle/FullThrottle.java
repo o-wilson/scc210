@@ -63,26 +63,29 @@ public class FullThrottle {
         float titleW = titleS.getGlobalBounds().width;
         titleS.setPosition((WINDOW_WIDTH - titleW) / 2, 50);
 
-        // Sprite settingsS = new Sprite(settingsT);
-        // uiSprites.add(settingsS);
-        // // settingsS.setScale(2, 2);
-        // settingsS.setPosition(10, 10);
-
         Sprite settingsS = new Sprite(settingsT);
         Button settingsButton = new Button(
             new Vector2f(10, 10), new Vector2i(64, 64),
-            "", settingsS,
-            UI.SpriteFillMode.STRETCH
+            settingsS, UI.SpriteFillMode.STRETCH
         );
         settingsButton.setAction(this, "settings");
         drawables.add(settingsButton);
         buttonManager.addObserver(settingsButton);
+
+        Button playButton = new Button(
+            Vector2f.ZERO, new Vector2i(196, 96)
+        );
+        float playButtonX = (WINDOW_WIDTH - playButton.getWidth()) /2;
+        playButton.setPosition(playButtonX, 400);
+        playButton.setAction(this, "play");
+        drawables.add(playButton);
+        buttonManager.addObserver(playButton);
     }
 
     private void update() {
         window.clear(Color.BLACK);
 
-        RenderStates rs = new RenderStates(BlendMode.ADD);
+        RenderStates rs = new RenderStates(BlendMode.ALPHA);
         for (Drawable d : drawables) {
             d.draw(window, rs);
         }
@@ -99,6 +102,10 @@ public class FullThrottle {
 
     public void settings() {
         System.out.println("Settings clicked");
+    }
+
+    public void play() {
+        System.out.println("Play game");
     }
 
     public static void main(String[] args) {
