@@ -59,6 +59,12 @@ public class FullThrottle {
         Texture settingsT = new FTTexture("./res/Settings.png");
         Texture buttonT = new FTTexture("./res/Button.png");
 
+        Texture squareButton = new FTTexture("./res/SquareButton.png");
+        Texture squareButtonDisabled = new FTTexture("./res/SquareButtonDisabled.png");
+        
+        Sprite tButton = new Sprite(squareButton);
+        Sprite tButtonDisabled = new Sprite(squareButtonDisabled);
+
         Sprite titleS = new Sprite(titleT);
         drawables.add(titleS);
         float titleW = titleS.getGlobalBounds().width;
@@ -81,6 +87,18 @@ public class FullThrottle {
         playButton.addAction(this, "play", ActionType.LEFT_CLICK);
         drawables.add(playButton);
         buttonManager.addObserver(playButton);
+
+        Button testButton = new Button(
+            new Vector2f(400, 400), new Vector2i(128, 128),
+            tButton, UI.SpriteFillMode.STRETCH
+        );
+        testButton.setDisabledSprite(tButtonDisabled);
+        testButton.addAction(this, "testEnabled", ActionType.LEFT_CLICK);
+        testButton.addAction(this, "testDisabled", ActionType.LEFT_CLICK, false);
+        buttonManager.addObserver(testButton);
+        drawables.add(testButton);
+
+        playButton.addAction(testButton, "toggleEnabled", ActionType.RIGHT_CLICK);
     }
 
     private void update() {
@@ -107,6 +125,14 @@ public class FullThrottle {
 
     public void play() {
         System.out.println("Play game");
+    }
+
+    public void testEnabled() {
+        System.out.println("Button is enabled");
+    }
+
+    public void testDisabled() {
+        System.out.println("Button is disabled");
     }
 
     public static void main(String[] args) {

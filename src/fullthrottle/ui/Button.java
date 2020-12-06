@@ -42,19 +42,35 @@ public class Button implements Observer, Drawable {
 
     private Vector2f position;
     private Vector2i size;
+
     private Sprite sourceSprite;
-    private Sprite drawnSprite;
+    private Sprite sourceDisabledSprite;
+
+    private Sprite enabledSprite;
+    private Sprite disabledSprite;
+
+    private Sprite activeSprite;
     private UI.SpriteFillMode fillMode;
 
+    /**
+     * Class containing all relevant data to invoke an action
+     */
     private class ButtonAction {
         public Object actionObject;
         public Method actionMethod;
         public ActionType actionType;
+        /**
+         * true = only execute when button is enabled
+         */
+        public boolean enabled;
 
-        public ButtonAction(Object o, Method m, ActionType t) {
+        public ButtonAction(
+            Object o, Method m, ActionType t, boolean e
+        ) {
             actionObject = o;
             actionMethod = m;
             actionType = t;
+            enabled = e;
         }
 
         public void execute() {
@@ -76,6 +92,9 @@ public class Button implements Observer, Drawable {
 
     private List<ButtonAction> actions;
 
+    /**
+     * Type of the mouse action
+     */
     public enum ActionType {
         LEFT_CLICK,
         RIGHT_CLICK,
@@ -87,6 +106,8 @@ public class Button implements Observer, Drawable {
     private boolean lastHovered;
     private boolean heldLeft;
     private boolean heldRight;
+
+    private boolean enabled;
     
     /**
      * Basic button with default UI sprite
@@ -123,12 +144,18 @@ public class Button implements Observer, Drawable {
         this.size = size;
         this.fillMode = fillMode;
         this.sourceSprite = sprite;
-        this.drawnSprite = UI.generateFillSprite(sprite, this.size, this.fillMode);
+        this.sourceDisabledSprite = sprite;
+
+        enabledSprite = UI.generateFillSprite(sprite, size, fillMode);
+        disabledSprite = enabledSprite;
+        this.activeSprite = enabledSprite;
 
         heldLeft = false;
         heldRight = false;
         hovered = false;
         lastHovered = false;
+
+        enabled = true;
 
         actions = new ArrayList<ButtonAction>();
     }
@@ -154,23 +181,36 @@ public class Button implements Observer, Drawable {
 
     /**
      * Attempts to add a new action to the button
+     * Sets action as for enabled button
      * @param o Instance with the method
      * @param m Action to perform on trigger
      * @param t Type of the action (trigger)
      * @return true if successful, false otherwise
      */
     public boolean addAction(Object o, String m, ActionType t) {
+        return addAction(o, m, t, true);
+    }
+
+    /**
+     * Attempts to add a new action to the button
+     * @param o Instance with the method
+     * @param m Action to perform on trigger
+     * @param t Type of the action (trigger)
+     * @param e State of the button for action to trigger, t=enabled
+     * @return true if successful, false otherwise
+     */
+    public boolean addAction(Object o, String m, ActionType t, boolean e) {
         Class<?> c = o.getClass();
         Method method = null;
         try {
             method = c.getMethod(m);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
         }
 
         if (method == null) return false;
 
-        ButtonAction a = new ButtonAction(o, method, t);
+        ButtonAction a = new ButtonAction(o, method, t, e);
         actions.add(a);
 
         return true;
@@ -178,6 +218,32 @@ public class Button implements Observer, Drawable {
 
     public void setPosition(float x, float y) {
         setPosition(new Vector2f(x, y));
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * Change whether the button is enabled
+     * @param b true = enable, false = disable
+     */
+    public void setEnabled(boolean b) {
+        boolean changed = b != enabled;
+        enabled = b;
+
+        //if there's no change then no need to update anything
+        if (!changed) return;
+    }
+
+    /**
+     * Sets the button to its opposite state and returns the new state
+     * @return true = now enabled, false = now disabled
+     */
+    public boolean toggleEnabled() {
+        setEnabled(!enabled);
+
+        return enabled;
     }
 
     public void setPosition(Vector2f newPos) {
@@ -202,20 +268,29 @@ public class Button implements Observer, Drawable {
 
     public void setSprite(Sprite newSprite) {
         this.sourceSprite = newSprite;
-        regenerateSprite();
+        regenerateSprites();
+    }
+
+    public void setDisabledSprite(Sprite newSprite) {
+        this.sourceDisabledSprite = newSprite;
+        regenerateSprites();
     }
 
     public void setFillMode(UI.SpriteFillMode fillMode) {
         this.fillMode = fillMode;
-        regenerateSprite();
+        regenerateSprites();
     }
 
     /**
      * Called when the source sprite or fill mode is changed
      */
-    private void regenerateSprite() {
-        this.drawnSprite = UI.generateFillSprite(
-            this.sourceSprite, this.size, this.fillMode
+    private void regenerateSprites() {
+        enabledSprite = UI.generateFillSprite(
+            sourceSprite, size, fillMode
+        );
+
+        disabledSprite = UI.generateFillSprite(
+            sourceDisabledSprite, size, fillMode
         );
     }
 
@@ -270,7 +345,7 @@ public class Button implements Observer, Drawable {
      */
     public void actionTriggered(ActionType t) {
         for (ButtonAction a : actions) {
-            if (a.isType(t)) {
+            if (a.isType(t) && (enabled == a.enabled)) {
                 a.execute();
             }
         }
@@ -278,16 +353,17 @@ public class Button implements Observer, Drawable {
 
     @Override
     public void draw(RenderTarget target, RenderStates states) {
-        this.drawnSprite.setPosition(this.position);
+        this.activeSprite = enabled ? enabledSprite : disabledSprite;
+        this.activeSprite.setPosition(this.position);
         
-        if (heldLeft || heldRight) {
-            this.drawnSprite.setColor(new Color(100, 100, 100));
-        } else if (hovered) {
-            this.drawnSprite.setColor(new Color(200, 200, 200));
+        if ((heldLeft || heldRight) && enabled) {
+            this.activeSprite.setColor(new Color(100, 100, 100));
+        } else if (hovered && enabled) {
+            this.activeSprite.setColor(new Color(200, 200, 200));
         } else {
-            this.drawnSprite.setColor(Color.WHITE);
+            this.activeSprite.setColor(Color.WHITE);
         }
 
-        this.drawnSprite.draw(target, states);
+        this.activeSprite.draw(target, states);
     }
 }
