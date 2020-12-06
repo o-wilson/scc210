@@ -70,6 +70,7 @@ public class FullThrottle {
 
         Sprite settingsS = new Sprite(settingsT);
         Button settingsButton = new Button(new Vector2f(10, 10), new Vector2i(64, 64), "", settingsS, Button.SpriteFillMode.STRETCH);
+        settingsButton.setAction(this, "settings");
         drawables.add(settingsButton);
         buttonManager.addObserver(settingsButton);
     }
@@ -90,6 +91,10 @@ public class FullThrottle {
             return window;
 
         return null;
+    }
+
+    public void settings() {
+        System.out.println("Settings clicked");
     }
 
     public static void main(String[] args) {

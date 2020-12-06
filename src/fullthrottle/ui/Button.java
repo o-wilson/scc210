@@ -7,6 +7,10 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.geom.AffineTransform;
 
+import java.lang.Class;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import java.util.Observer;
 import java.util.Observable;
 
@@ -68,6 +72,9 @@ public class Button implements Observer, Drawable {
     private Sprite sourceSprite;
     private Sprite drawnSprite;
     private SpriteFillMode fillMode;
+
+    private Object actionObject;
+    private Method clickAction;
 
     private boolean hovered;
     private boolean held;
@@ -207,6 +214,27 @@ public class Button implements Observer, Drawable {
         return true;
     }
 
+    /**
+     * Attempts to set the button's action to a method on an object
+     * @param object Instance with the method
+     * @param method Action to perform when button clicked
+     * @return true if successful, false otherwise
+     */
+    public boolean setAction(Object object, String method) {
+        Class<?> c = object.getClass();
+        this.actionObject = object;
+        Method m = null;
+        try {
+            m = c.getMethod(method);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+
+        this.clickAction = m;
+
+        return (m != null);
+    }
+
     @Override
     public void update(Observable o, Object event) {
         Event e = (Event)event;
@@ -237,8 +265,20 @@ public class Button implements Observer, Drawable {
         }
     }
 
+    /**
+     * Called when the button is clicked (pressed and released)
+     * Attempts to invoke the button's action
+     */
     public void actionTriggered() {
-        System.out.println("Action triggered");
+        if (clickAction != null && actionObject != null) {
+            try {
+                clickAction.invoke(actionObject);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
