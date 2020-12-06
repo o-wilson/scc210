@@ -1,3 +1,3 @@
 @echo off
 
-java -cp out;lib/jsfml.jar fullthrottle.Main
+java -cp out;lib/jsfml.jar fullthrottle.FullThrottle
