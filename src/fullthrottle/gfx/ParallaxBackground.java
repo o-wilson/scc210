@@ -27,23 +27,33 @@ public class ParallaxBackground implements Drawable, Updatable {
         private Sprite loopSprite;
         private int zIndex;
 
-        public BackgroundElement(Sprite s, int z) {
+        private FloatRect bounds;
+
+        private float loopFrequency;
+
+        public BackgroundElement(Sprite s, int z, float freq) {
             this.sprite = s;
             this.zIndex = z;
+            this.bounds = sprite.getGlobalBounds();
+            this.loopFrequency = freq;
 
             this.loopSprite = new Sprite(s.getTexture());
             loopSprite.setPosition(s.getPosition());
             loopSprite.setScale(s.getScale());
         }
 
-        public void update() {
+        public void update(FloatRect view) {
             float dX = speed * TimeManager.deltaTime() / zIndex;
             sprite.move(dX * direction.directionMultiplier, 0);
 
-            FloatRect b = sprite.getGlobalBounds();
+            bounds = sprite.getGlobalBounds();
 
-            if (b.left <= -b.width) {
-                sprite.move(b.width, 0);
+            boolean offscreenL = bounds.left < view.left - loopFrequency;
+            boolean offscreenR = bounds.left >= view.left + view.width;
+            boolean offscreen = offscreenL || offscreenR;
+
+            if (offscreen) {
+                sprite.move(loopFrequency * -direction.directionMultiplier, 0);
             }
         }
 
@@ -51,13 +61,13 @@ public class ParallaxBackground implements Drawable, Updatable {
             RenderTarget target, RenderStates states,
             FloatRect view
         ) {
-            FloatRect sB = sprite.getGlobalBounds();
-            if (sB.left > view.left - sB.width)
-                sprite.draw(target, states);
+            sprite.draw(target, states);
 
-            if (sB.left <= view.left + view.width - sB.width) {
-                loopSprite.setPosition(sB.left + sB.width, sB.top);
+            float loopX = bounds.left;
+            while (loopX <= view.left + view.width - loopFrequency) {
+                loopSprite.setPosition(loopX + loopFrequency, bounds.top);
                 loopSprite.draw(target, states);
+                loopX = loopSprite.getGlobalBounds().left;
             }
         }
     }
@@ -89,8 +99,12 @@ public class ParallaxBackground implements Drawable, Updatable {
     }
 
     public void addElement(Sprite s, int zIndex, Vector2f startPos) {
+        addElement(s, zIndex, startPos, s.getGlobalBounds().width);
+    }
+
+    public void addElement(Sprite s, int zIndex, Vector2f startPos, float loopFrequency) {
         s.setPosition(startPos);
-        BackgroundElement elem = new BackgroundElement(s, zIndex);
+        BackgroundElement elem = new BackgroundElement(s, zIndex, loopFrequency);
 
         if (!elements.containsKey(zIndex)) {
             elements.put(zIndex, new ArrayList<>());
@@ -105,20 +119,26 @@ public class ParallaxBackground implements Drawable, Updatable {
 
     @Override
     public void update() {
+        FloatRect vBounds = getViewRect();
+
         for (ArrayList<BackgroundElement> z : elements.values())
             for (BackgroundElement e : z)
-                e.update();
+                e.update(vBounds);
     }
 
     @Override
     public void draw(RenderTarget target, RenderStates states) {
-        ConstView v = FullThrottle.getWindow().getView();
-        Vector2f halfSize = Vector2f.div(v.getSize(), 2f);
-        Vector2f vo = Vector2f.sub(v.getCenter(), halfSize);
-        FloatRect vBounds = new FloatRect(vo, v.getSize());
+        FloatRect vBounds = getViewRect();
 
         for (int i : zLayers)
             for (BackgroundElement e : elements.get(i))
                 e.draw(target, states, vBounds);
+    }
+
+    private FloatRect getViewRect() {
+        ConstView v = FullThrottle.getWindow().getView();
+        Vector2f halfSize = Vector2f.div(v.getSize(), 2f);
+        Vector2f vo = Vector2f.sub(v.getCenter(), halfSize);
+        return new FloatRect(vo, v.getSize());
     }
 }
