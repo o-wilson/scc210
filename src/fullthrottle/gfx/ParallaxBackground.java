@@ -14,6 +14,8 @@ import org.jsfml.graphics.View;
 
 import org.jsfml.system.Vector2f;
 
+import java.lang.RuntimeException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +23,12 @@ import java.util.HashMap;
 
 public class ParallaxBackground implements Drawable, Updatable {
     
+    public class InvalidIndexException extends RuntimeException {
+        public InvalidIndexException(int index) {
+            super("Invalid Z-Index: " + index);
+        }
+    }
+
     private class BackgroundElement {
 
         private Sprite sprite;
@@ -64,10 +72,15 @@ public class ParallaxBackground implements Drawable, Updatable {
             sprite.draw(target, states);
 
             float loopX = bounds.left;
-            while (loopX <= view.left + view.width - loopFrequency) {
-                loopSprite.setPosition(loopX + loopFrequency, bounds.top);
+            
+            boolean spaceLeft = loopX <= view.left + view.width - bounds.width;
+            boolean spaceRight = loopX > view.left;
+            while ((spaceLeft && (direction == Direction.LEFT)) ^ (spaceRight && (direction == Direction.RIGHT))) {
+                loopSprite.setPosition(loopX - direction.directionMultiplier * loopFrequency, bounds.top);
                 loopSprite.draw(target, states);
                 loopX = loopSprite.getGlobalBounds().left;
+                spaceLeft = loopX <= view.left + view.width - bounds.width;
+                spaceRight = loopX > view.left;
             }
         }
     }
@@ -99,10 +112,16 @@ public class ParallaxBackground implements Drawable, Updatable {
     }
 
     public void addElement(Sprite s, int zIndex, Vector2f startPos) {
+        if (zIndex <= 0)
+            throw new InvalidIndexException(zIndex);
+            
         addElement(s, zIndex, startPos, s.getGlobalBounds().width);
     }
 
     public void addElement(Sprite s, int zIndex, Vector2f startPos, float loopFrequency) {
+        if (zIndex <= 0)
+            throw new InvalidIndexException(zIndex);
+
         s.setPosition(startPos);
         BackgroundElement elem = new BackgroundElement(s, zIndex, loopFrequency);
 
@@ -129,7 +148,7 @@ public class ParallaxBackground implements Drawable, Updatable {
     @Override
     public void draw(RenderTarget target, RenderStates states) {
         FloatRect vBounds = getViewRect();
-
+        
         for (int i : zLayers)
             for (BackgroundElement e : elements.get(i))
                 e.draw(target, states, vBounds);
