@@ -28,18 +28,34 @@ public class FullThrottle {
     // private ArrayList<Drawable> drawables;
     private ArrayList<Updatable> updatables;
 
+    private Text fpsCount;
+
     public FullThrottle() {
         start();
+
+        fpsCount = new Text("60 FPS", UI.DEFAULT_UI_FONT);
+        fpsCount.setColor(Color.RED);
+        fpsCount.setPosition(1150, 10);
+        double avgFps = 60;
         
         while(window.isOpen()) {
             TimeManager.update();
-            update();
 
-            // System.out.println(1 / TimeManager.deltaTime());
+            /*
+             * first few frames are insanely fast and make
+             * the framerate seem unnaturally high, so we ignore them
+             */
+            if(TimeManager.deltaTime() >= 1f/144)
+                avgFps = 0.9 * avgFps + (1 - 0.9) * (1 / TimeManager.deltaTime());
+
+            fpsCount.setString((int)avgFps + " FPS");
+            
+            update();
 
             window.clear(Color.BLACK);
 
             Renderer.render(window);
+            fpsCount.draw(window, new RenderStates(BlendMode.ALPHA));
             
             window.display();
 
