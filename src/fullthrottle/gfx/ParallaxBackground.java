@@ -152,16 +152,19 @@ public class ParallaxBackground implements Drawable, Updatable {
     private Direction direction;
     private float speed;
 
+    private RenderTarget target;
+
     /**
      * Create a new parallax background with direction and speed
+     * @param t RenderTarget for background to be drawn to
      * @param d Direction for background to move
      * @param s base speed multiplier for background elements to move
      * relative to
      */
-    public ParallaxBackground(Direction d, float s) {
+    public ParallaxBackground(RenderTarget t, Direction d, float s) {
         //if negative speed given, invert direction and speed
         if (s < 0) {
-            if (d = Direction.LEFT)
+            if (d == Direction.LEFT)
                 d = Direction.RIGHT;
             else
                 d = Direction.LEFT;
@@ -169,6 +172,7 @@ public class ParallaxBackground implements Drawable, Updatable {
             s = -s;
         }
 
+        this.target = t;
         this.direction = d;
         this.speed = s;
 
@@ -231,7 +235,7 @@ public class ParallaxBackground implements Drawable, Updatable {
 
     @Override
     public void update() {
-        FloatRect vBounds = getViewRect();
+        FloatRect vBounds = getViewRect(this.target);
 
         for (ArrayList<BackgroundElement> z : elements.values())
             for (BackgroundElement e : z)
@@ -240,7 +244,7 @@ public class ParallaxBackground implements Drawable, Updatable {
 
     @Override
     public void draw(RenderTarget target, RenderStates states) {
-        FloatRect vBounds = getViewRect();
+        FloatRect vBounds = getViewRect(this.target);
         
         for (int i : zLayers)
             for (BackgroundElement e : elements.get(i))
