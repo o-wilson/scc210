@@ -121,14 +121,21 @@ public class FullThrottle {
         Texture sky = new FTTexture("./res/BackgroundTest/Sky.png");
         Texture buildings = new FTTexture("./res/BackgroundTest/Buildings.png");
         Texture road = new FTTexture("./res/BackgroundTest/Road.png");
+        Texture bush = new FTTexture("./res/BackgroundTest/Bush.png");
 
         Sprite skyS = new Sprite(sky);
+        skyS.scale(2.8125f, 2.8125f);
         Sprite buildingsS = new Sprite(buildings);
+        buildingsS.scale(2.8125f, 2.8125f);
         Sprite roadS = new Sprite(road);
+        roadS.scale(2.8125f, 2.8125f);
+        Sprite bushS = new Sprite(bush);
+        bushS.scale(2.8125f, 2.8125f);
 
         bg.addElement(skyS, 30, Vector2f.ZERO);
         bg.addElement(buildingsS, 15, Vector2f.ZERO);
         bg.addElement(roadS, 5, Vector2f.ZERO);
+        bg.addElement(bushS, 5, new Vector2f(400, 506.25f));
 
         updatables.add(bg);
         Renderer.addDrawable(bg, 1000);
