@@ -1,6 +1,9 @@
 package fullthrottle;
 
 import fullthrottle.gfx.*;
+import fullthrottle.gfx.ParallaxBackground.Direction;
+import fullthrottle.util.TimeManager;
+import fullthrottle.util.Updatable;
 import fullthrottle.ui.*;
 import fullthrottle.ui.Button.ActionType;
 
@@ -22,13 +25,23 @@ public class FullThrottle {
 
     private ButtonManager buttonManager;
 
-    private ArrayList<Drawable> drawables;
+    // private ArrayList<Drawable> drawables;
+    private ArrayList<Updatable> updatables;
 
     public FullThrottle() {
         start();
         
         while(window.isOpen()) {
+            TimeManager.update();
             update();
+
+            // System.out.println(1 / TimeManager.deltaTime());
+
+            window.clear(Color.BLACK);
+
+            Renderer.render(window);
+            
+            window.display();
 
             //Handle events
             for(Event event : window.pollEvents()) {
@@ -53,7 +66,8 @@ public class FullThrottle {
 
         buttonManager = ButtonManager.getInstance();
 
-        drawables = new ArrayList<>();
+        // drawables = new ArrayList<>();
+        updatables = new ArrayList<>();
 
         Texture titleT = new FTTexture("./res/Title.png");
         Texture settingsT = new FTTexture("./res/Settings.png");
@@ -66,7 +80,7 @@ public class FullThrottle {
         Sprite tButtonDisabled = new Sprite(squareButtonDisabled);
 
         Sprite titleS = new Sprite(titleT);
-        drawables.add(titleS);
+        Renderer.addDrawable(titleS);
         float titleW = titleS.getGlobalBounds().width;
         titleS.setPosition((WINDOW_WIDTH - titleW) / 2, 50);
 
@@ -76,7 +90,7 @@ public class FullThrottle {
             settingsS, UI.SpriteFillMode.STRETCH
         );
         settingsButton.addAction(this, "settings", ActionType.LEFT_CLICK);
-        drawables.add(settingsButton);
+        Renderer.addDrawable(settingsButton);
         buttonManager.addObserver(settingsButton);
 
         Button playButton = new Button(
@@ -85,7 +99,7 @@ public class FullThrottle {
         float playButtonX = (WINDOW_WIDTH - playButton.getWidth()) /2;
         playButton.setPosition(playButtonX, 400);
         playButton.addAction(this, "play", ActionType.LEFT_CLICK);
-        drawables.add(playButton);
+        Renderer.addDrawable(playButton);
         buttonManager.addObserver(playButton);
 
         Button testButton = new Button(
@@ -96,20 +110,34 @@ public class FullThrottle {
         testButton.addAction(this, "testEnabled", ActionType.LEFT_CLICK);
         testButton.addAction(this, "testDisabled", ActionType.LEFT_CLICK, false);
         buttonManager.addObserver(testButton);
-        drawables.add(testButton);
+        Renderer.addDrawable(testButton);
 
         playButton.addAction(testButton, "toggleEnabled", ActionType.RIGHT_CLICK);
+
+
+        // BACKGROUND TEST
+        ParallaxBackground bg = new ParallaxBackground(Direction.LEFT, 500);
+
+        Texture sky = new FTTexture("./res/BackgroundTest/Sky.png");
+        Texture buildings = new FTTexture("./res/BackgroundTest/Buildings.png");
+        Texture road = new FTTexture("./res/BackgroundTest/Road.png");
+
+        Sprite skyS = new Sprite(sky);
+        Sprite buildingsS = new Sprite(buildings);
+        Sprite roadS = new Sprite(road);
+
+        bg.addElement(skyS, 30, Vector2f.ZERO);
+        bg.addElement(buildingsS, 15, Vector2f.ZERO);
+        bg.addElement(roadS, 5, Vector2f.ZERO);
+
+        updatables.add(bg);
+        Renderer.addDrawable(bg, 1000);
     }
 
     private void update() {
-        window.clear(Color.BLACK);
-
-        RenderStates rs = new RenderStates(BlendMode.ALPHA);
-        for (Drawable d : drawables) {
-            d.draw(window, rs);
+        for (Updatable u : updatables) {
+            u.update();
         }
-
-        window.display();
     }
 
     public static RenderWindow getWindow() {
