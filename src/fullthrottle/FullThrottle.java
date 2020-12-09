@@ -135,7 +135,7 @@ public class FullThrottle {
         bg.addElement(skyS, 30, Vector2f.ZERO);
         bg.addElement(buildingsS, 15, Vector2f.ZERO);
         bg.addElement(roadS, 5, Vector2f.ZERO);
-        bg.addElement(bushS, 5, new Vector2f(1000, 506.25f), 500);
+        bg.addElement(bushS, -5, new Vector2f(1000, 506.25f), 500);
 
         updatables.add(bg);
         Renderer.addDrawable(bg, 1000);
