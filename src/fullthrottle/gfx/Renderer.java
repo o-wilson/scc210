@@ -1,5 +1,7 @@
 package fullthrottle.gfx;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -7,15 +9,17 @@ import java.util.List;
 
 import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.Drawable;
+import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
+import org.jsfml.graphics.Sprite;
 
 /**
- * Class for handling rendering, including ordering of sprites
- * No need to instantiate - all methods static
+ * Class for handling rendering, including ordering of sprites No need to
+ * instantiate - all methods static
  */
 public final class Renderer {
-    
+
     private static RenderStates DEFAULT_RENDER_STATES = new RenderStates(BlendMode.ALPHA);
     private static int DEFAULT_RENDER_LAYER = 1;
 
@@ -34,7 +38,8 @@ public final class Renderer {
 
         /**
          * Called from addDrawable
-         * @param d object implementing JSFML's Drawable
+         * 
+         * @param d  object implementing JSFML's Drawable
          * @param rs RenderStates for drawing
          */
         public RenderObject(Drawable d, RenderStates rs) {
@@ -44,10 +49,43 @@ public final class Renderer {
 
         /**
          * Invokes the drawables draw method
+         * 
          * @param target RenderTarget to be drawn to (e.g. RenderWindow)
          */
         public void draw(RenderTarget target) {
             drawable.draw(target, rs);
+        }
+
+        public boolean onscreen(FloatRect view) {
+            FloatRect bounds = new FloatRect(0, 0, 0, 0);
+            Class<?> c = drawable.getClass();
+            Method gB = null;
+
+            try {
+                gB = c.getMethod("getGlobalBounds");
+            } catch (NoSuchMethodException e) {
+                try {
+                    gB = c.getMethod("getBounds");
+                } catch (NoSuchMethodException ex) {
+                    gB = null;
+                }
+            }
+
+            if (gB != null)
+                try {
+                    bounds = (FloatRect) gB.invoke(drawable);
+                } catch (IllegalAccessException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IllegalArgumentException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            
+            return bounds.intersection(view) != null || gB == null;
         }
     }
 
@@ -69,9 +107,15 @@ public final class Renderer {
      * @param target RenderTarget to draw to
      */
     public static void render(RenderTarget target) {
+        FloatRect view = target.getView().getViewport();
+
         for (int i : renderLayers)
             for (RenderObject o : objects.get(i))
-                o.draw(target);
+                if (o.onscreen(view))
+                    if (o.getClass().isAssignableFrom(Class<Sprite>)) {
+                        System.out.println("instanceof Sprite");
+                    } else
+                        o.draw(target);
     }
 
     /**
