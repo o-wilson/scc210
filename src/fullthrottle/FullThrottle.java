@@ -96,7 +96,7 @@ public class FullThrottle {
         Sprite tButtonDisabled = new Sprite(squareButtonDisabled);
 
         Sprite titleS = new Sprite(titleT);
-        // Renderer.addDrawable(titleS);
+        Renderer.addDrawable(titleS);
         float titleW = titleS.getGlobalBounds().width;
         titleS.setPosition((WINDOW_WIDTH - titleW) / 2, 50);
 
@@ -106,7 +106,7 @@ public class FullThrottle {
             settingsS, UI.SpriteFillMode.STRETCH
         );
         settingsButton.addAction(this, "settings", ActionType.LEFT_CLICK);
-        // Renderer.addDrawable(settingsButton);
+        Renderer.addDrawable(settingsButton);
         buttonManager.addObserver(settingsButton);
 
         Button playButton = new Button(
@@ -115,7 +115,7 @@ public class FullThrottle {
         float playButtonX = (WINDOW_WIDTH - playButton.getWidth()) /2;
         playButton.setPosition(playButtonX, 400);
         playButton.addAction(this, "play", ActionType.LEFT_CLICK);
-        // Renderer.addDrawable(playButton);
+        Renderer.addDrawable(playButton);
         buttonManager.addObserver(playButton);
 
         Button testButton = new Button(
@@ -126,13 +126,13 @@ public class FullThrottle {
         testButton.addAction(this, "testEnabled", ActionType.LEFT_CLICK);
         testButton.addAction(this, "testDisabled", ActionType.LEFT_CLICK, false);
         buttonManager.addObserver(testButton);
-        // Renderer.addDrawable(testButton);
+        Renderer.addDrawable(testButton);
 
         playButton.addAction(testButton, "toggleEnabled", ActionType.RIGHT_CLICK);
 
 
         // BACKGROUND TEST
-        ParallaxBackground bg = new ParallaxBackground(window, Direction.LEFT, 700);
+        ParallaxBackground bg = new ParallaxBackground(window, Direction.LEFT, 3000);
 
         Texture sky = new FTTexture("./res/BackgroundTest/Sky.png");
         Texture buildings = new FTTexture("./res/BackgroundTest/Buildings.png");
@@ -154,7 +154,7 @@ public class FullThrottle {
         bg.addElement(bushS, 5, new Vector2f(1000, 506.25f), 500);
 
         updatables.add(bg);
-        // Renderer.addDrawable(bg, 1000);
+        Renderer.addDrawable(bg, 1000);
 
 
 
@@ -162,8 +162,10 @@ public class FullThrottle {
         Texture carSprites = new FTTexture("./res/AnimationTest.png");
         Vector2i fS = new Vector2i(32, 32);
         SpriteSequence carSeq = new SpriteSequence(carSprites, fS);
-        Animation carAnim = new Animation(carSeq, 4);
+        Animation carAnim = new Animation(carSeq, 8);
         Renderer.addDrawable(carAnim);
+        carAnim.setScale(new Vector2f(5, 5));
+        carAnim.setPosition(new Vector2f(900, 450));
     }
 
     private void update() {
