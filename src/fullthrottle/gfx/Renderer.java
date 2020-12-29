@@ -112,10 +112,7 @@ public final class Renderer {
         for (int i : renderLayers)
             for (RenderObject o : objects.get(i))
                 if (o.onscreen(view))
-                    if (o.getClass().isAssignableFrom(Class<Sprite>)) {
-                        System.out.println("instanceof Sprite");
-                    } else
-                        o.draw(target);
+                    o.draw(target);
     }
 
     /**
