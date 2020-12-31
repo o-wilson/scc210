@@ -8,11 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.jsfml.graphics.BlendMode;
+import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.Drawable;
 import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
+import org.jsfml.system.Vector2f;
 
 /**
  * Class for handling rendering, including ordering of sprites No need to
@@ -84,7 +86,7 @@ public final class Renderer {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-            
+
             return bounds.intersection(view) != null || gB == null;
         }
     }
@@ -107,7 +109,10 @@ public final class Renderer {
      * @param target RenderTarget to draw to
      */
     public static void render(RenderTarget target) {
-        FloatRect view = target.getView().getViewport();
+        ConstView v = target.getView();
+        Vector2f halfSize = Vector2f.div(v.getSize(), 2f);
+        Vector2f vo = Vector2f.sub(v.getCenter(), halfSize);
+        FloatRect view = new FloatRect(vo, v.getSize());
 
         for (int i : renderLayers)
             for (RenderObject o : objects.get(i))
