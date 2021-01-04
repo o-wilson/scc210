@@ -1,9 +1,6 @@
 package fullthrottle.ui;
 
-import fullthrottle.debug.DebugRect;
 import fullthrottle.FullThrottle;
-import fullthrottle.gfx.FTTexture;
-import fullthrottle.ui.UI;
 
 import java.lang.Class;
 import java.lang.reflect.InvocationTargetException;
@@ -14,18 +11,11 @@ import java.util.List;
 import java.util.Observer;
 import java.util.Observable;
 
-import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.Drawable;
-import org.jsfml.graphics.FloatRect;
-import org.jsfml.graphics.Font;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.Sprite;
-import org.jsfml.graphics.Text;
-import org.jsfml.graphics.Texture;
-
-import org.jsfml.graphics.RectangleShape;
 
 import org.jsfml.system.Vector2i;
 import org.jsfml.system.Vector2f;

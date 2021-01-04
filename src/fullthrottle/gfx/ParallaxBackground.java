@@ -1,6 +1,5 @@
 package fullthrottle.gfx;
 
-import fullthrottle.FullThrottle;
 import fullthrottle.util.TimeManager;
 import fullthrottle.util.Updatable;
 
@@ -10,7 +9,6 @@ import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.Sprite;
-import org.jsfml.graphics.View;
 
 import org.jsfml.system.Vector2f;
 

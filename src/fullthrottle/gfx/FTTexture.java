@@ -17,7 +17,7 @@ public class FTTexture extends Texture {
         super();
         try {
             loadFromFile(Paths.get(path));
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

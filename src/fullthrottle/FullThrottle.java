@@ -87,7 +87,6 @@ public class FullThrottle {
 
         Texture titleT = new FTTexture("./res/Title.png");
         Texture settingsT = new FTTexture("./res/Settings.png");
-        Texture buttonT = new FTTexture("./res/Button.png");
 
         Texture squareButton = new FTTexture("./res/SquareButton.png");
         Texture squareButtonDisabled = new FTTexture("./res/SquareButtonDisabled.png");
