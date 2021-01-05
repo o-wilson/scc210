@@ -140,6 +140,16 @@ public final class Renderer {
     }
 
     /**
+     * Add a Drawable object to be rendered,
+     * uses default render layer (1)
+     * @param d object to be drawn
+     * @param rs RenderStates to use when drawing object
+     */
+    public static void addDrawable(Drawable d, RenderStates rs) {
+        addDrawable(d, DEFAULT_RENDER_LAYER, rs);
+    }
+
+    /**
      * Add a Drawable object to be rendered
      * @param d object to be drawn
      * @param rL layer to assign object to (higher = further back)
