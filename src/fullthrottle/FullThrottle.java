@@ -1,21 +1,35 @@
 package fullthrottle;
 
-import fullthrottle.gfx.*;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+
+import org.jsfml.graphics.BlendMode;
+import org.jsfml.graphics.Color;
+import org.jsfml.graphics.Image;
+import org.jsfml.graphics.RenderStates;
+import org.jsfml.graphics.RenderWindow;
+import org.jsfml.graphics.Sprite;
+import org.jsfml.graphics.Text;
+import org.jsfml.graphics.Texture;
+import org.jsfml.system.Vector2f;
+import org.jsfml.system.Vector2i;
+import org.jsfml.window.Keyboard.Key;
+import org.jsfml.window.VideoMode;
+import org.jsfml.window.WindowStyle;
+import org.jsfml.window.event.Event;
+
+import fullthrottle.gfx.FTTexture;
+import fullthrottle.gfx.ParallaxBackground;
 import fullthrottle.gfx.ParallaxBackground.Direction;
+import fullthrottle.gfx.Renderer;
+import fullthrottle.ui.Button;
+import fullthrottle.ui.Button.ActionType;
+import fullthrottle.ui.ButtonManager;
+import fullthrottle.ui.UI;
+import fullthrottle.util.Input;
 import fullthrottle.util.TimeManager;
 import fullthrottle.util.Updatable;
-import fullthrottle.ui.*;
-import fullthrottle.ui.Button.ActionType;
-
-import org.jsfml.graphics.*;
-
-import org.jsfml.system.Vector2i;
-import org.jsfml.system.Vector2f;
-
-import org.jsfml.window.*;
-import org.jsfml.window.event.*;
-
-import java.util.ArrayList;
 
 public class FullThrottle {
     public static final int WINDOW_WIDTH = 1280;
@@ -29,6 +43,7 @@ public class FullThrottle {
     private ArrayList<Updatable> updatables;
 
     private Text fpsCount;
+    private boolean showFps = false;
 
     public FullThrottle() {
         start();
@@ -49,17 +64,9 @@ public class FullThrottle {
                 avgFps = 0.9 * avgFps + (1 - 0.9) * (1 / TimeManager.deltaTime());
 
             fpsCount.setString((int)avgFps + " FPS");
-            
-            update();
-
-            window.clear(Color.BLACK);
-
-            Renderer.render(window);
-            fpsCount.draw(window, new RenderStates(BlendMode.ALPHA));
-            
-            window.display();
 
             //Handle events
+            Input.clearFlags();
             for(Event event : window.pollEvents()) {
                 if(event.type == Event.Type.CLOSED) {
                     //The user pressed the close button
@@ -68,8 +75,29 @@ public class FullThrottle {
                 
                 if (event.asMouseEvent() != null) {
                     buttonManager.mouseEvent(event);
+
+                    if (event.asMouseButtonEvent() != null) {
+                        Input.mouseEvent(event);
+                    }
+                }
+
+                if (event.asKeyEvent() != null) {
+                    Input.keyEvent(event);
                 }
             }
+            
+            update();
+
+            window.clear(Color.BLACK);
+
+            Renderer.render(window);
+
+            if (Input.getKeyDown(Key.F3))
+                showFps = !showFps;
+            if (showFps)
+                fpsCount.draw(window, new RenderStates(BlendMode.ALPHA));
+            
+            window.display();
         }
     }
 
@@ -79,6 +107,15 @@ public class FullThrottle {
             "Full Throttle",
             WindowStyle.TITLEBAR | WindowStyle.CLOSE
         );
+        window.setKeyRepeatEnabled(false);
+
+        Image icon = new Image();
+        try {
+            icon.loadFromFile(Paths.get("./res/Icon.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        window.setIcon(icon);
 
         buttonManager = ButtonManager.getInstance();
 
@@ -87,7 +124,6 @@ public class FullThrottle {
 
         Texture titleT = new FTTexture("./res/Title.png");
         Texture settingsT = new FTTexture("./res/Settings.png");
-        Texture buttonT = new FTTexture("./res/Button.png");
 
         Texture squareButton = new FTTexture("./res/SquareButton.png");
         Texture squareButtonDisabled = new FTTexture("./res/SquareButtonDisabled.png");

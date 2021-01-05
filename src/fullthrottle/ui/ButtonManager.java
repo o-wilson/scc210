@@ -2,8 +2,6 @@ package fullthrottle.ui;
 
 import java.util.Observable;
 
-import org.jsfml.window.Mouse;
-
 import org.jsfml.window.event.*;
 
 /**
