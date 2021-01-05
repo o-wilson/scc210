@@ -1,9 +1,12 @@
 package fullthrottle;
 
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.Color;
+import org.jsfml.graphics.Image;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderWindow;
 import org.jsfml.graphics.Sprite;
@@ -105,6 +108,14 @@ public class FullThrottle {
             WindowStyle.TITLEBAR | WindowStyle.CLOSE
         );
         window.setKeyRepeatEnabled(false);
+
+        Image icon = new Image();
+        try {
+            icon.loadFromFile(Paths.get("./res/Icon.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        window.setIcon(icon);
 
         buttonManager = ButtonManager.getInstance();
 
