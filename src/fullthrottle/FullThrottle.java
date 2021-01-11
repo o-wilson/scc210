@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+//Exprimental don't touch
+import org.jsfml.audio.Music;
 import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.Image;
@@ -23,6 +25,7 @@ import fullthrottle.gfx.FTTexture;
 import fullthrottle.gfx.ParallaxBackground;
 import fullthrottle.gfx.ParallaxBackground.Direction;
 import fullthrottle.gfx.Renderer;
+import fullthrottle.sfx.FTMusic;
 import fullthrottle.ui.Button;
 import fullthrottle.ui.Button.ActionType;
 import fullthrottle.ui.ButtonManager;
@@ -30,6 +33,7 @@ import fullthrottle.ui.UI;
 import fullthrottle.util.Input;
 import fullthrottle.util.TimeManager;
 import fullthrottle.util.Updatable;
+
 
 public class FullThrottle {
     public static final int WINDOW_WIDTH = 1280;
@@ -102,6 +106,7 @@ public class FullThrottle {
     }
 
     private void start() {
+
         window = new RenderWindow(
             new VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT),
             "Full Throttle",
@@ -188,6 +193,13 @@ public class FullThrottle {
         bg.addElement(buildingsS, 15, Vector2f.ZERO);
         bg.addElement(roadS, 5, Vector2f.ZERO);
         bg.addElement(bushS, 5, new Vector2f(1000, 506.25f), 500);
+
+        //Added stuff for the audio
+        Music menu_music = new FTMusic("./res/Music/scorched_earth.wav");
+        System.out.println(menu_music.getVolume());
+        menu_music.play();
+        //END of added stuff for the audio
+
 
         updatables.add(bg);
         Renderer.addDrawable(bg, 1000);
