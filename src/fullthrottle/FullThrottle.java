@@ -42,6 +42,9 @@ public class FullThrottle {
     private static RenderWindow window;
 
     private ButtonManager buttonManager;
+    //Music stuff don't touch for now pls Java garbage collection is making a problems 
+    Music menu_music = new FTMusic("./res/Music/scorched_earth_original.ogg");
+    //
 
     // private ArrayList<Drawable> drawables;
     private ArrayList<Updatable> updatables;
@@ -195,8 +198,6 @@ public class FullThrottle {
         bg.addElement(bushS, 5, new Vector2f(1000, 506.25f), 500);
 
         //Added stuff for the audio
-        Music menu_music = new FTMusic("./res/Music/scorched_earth.wav");
-        System.out.println(menu_music.getVolume());
         menu_music.play();
         //END of added stuff for the audio
 
