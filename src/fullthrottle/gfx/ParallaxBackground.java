@@ -5,26 +5,31 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.Drawable;
 import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.Image;
 import org.jsfml.graphics.IntRect;
+import org.jsfml.graphics.PrimitiveType;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.TextureCreationException;
+import org.jsfml.graphics.Vertex;
 import org.jsfml.graphics.VertexArray;
 import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 import org.jsfml.system.Vector3f;
 
+import fullthrottle.util.TimeManager;
 import fullthrottle.util.Updatable;
 
 /**
@@ -50,27 +55,58 @@ public class ParallaxBackground implements Drawable, Updatable {
      */
     private class BackgroundElement {
 
+        private Vector2f position;
+        private Vector2f size;
+
         private int zIndex;
-        private FloatRect bounds;
-
-        private int globalTextureIndex;
-        private FloatRect textureCoords;
-
         private float loopFrequency;
 
-        VertexArray va;
+        private int globalTextureIndex;
+        private Vector2f textureStart;
+        private Vector2f textureDimensions;
 
-        public BackgroundElement(int z, float freq, Vector2f startPos, Vector2f scale, int globalTextureIndex,
-                FloatRect textureCoords, Drawable d) {
-            this.zIndex = z;
-            Vector2f size = new Vector2f(textureCoords.width, textureCoords.height);
-            size = Vector2f.componentwiseMul(size, scale);
+        private VertexArray va;
 
-            this.bounds = new FloatRect(startPos, size);
-            this.loopFrequency = freq;
+        private boolean usesTexture;
 
-            this.va = new VertexArray();
+        private Vector2f[] vertexOrder;
 
+        public BackgroundElement(
+            FloatRect bounds, int zIndex, float loopFrequency,
+            int globalTextureIndex, FloatRect textureCoords
+        ) {
+            this(bounds, zIndex, loopFrequency);
+
+            this.usesTexture = true;
+            this.globalTextureIndex = globalTextureIndex;
+            this.textureStart = new Vector2f(
+                textureCoords.left, textureCoords.top
+            );
+            this.textureDimensions = new Vector2f(
+                textureCoords.width, textureCoords.height
+            );
+        }
+
+        public BackgroundElement(
+            FloatRect bounds, int zIndex, float loopFrequency
+        ) {
+            this.usesTexture = false;
+
+            this.position = new Vector2f(
+                bounds.left, bounds.top
+            );
+            this.size = new Vector2f(
+                bounds.width, bounds.height
+            );
+
+            this.zIndex = zIndex;
+            this.loopFrequency = loopFrequency;
+
+            vertexOrder = new Vector2f[4];
+            vertexOrder[0] = new Vector2f(0, 0); //TL
+            vertexOrder[1] = new Vector2f(1, 0); //TR
+            vertexOrder[2] = new Vector2f(1, 1); //BR
+            vertexOrder[3] = new Vector2f(0, 1); //BL
         }
 
         /**
@@ -81,19 +117,22 @@ public class ParallaxBackground implements Drawable, Updatable {
          *             are looped if visible
          */
         public void update(FloatRect view) {
-            // float dX = speed * TimeManager.deltaTime() / zIndex;
-            // sprite.move(dX * direction.directionMultiplier, 0);
+            int d = direction.directionMultiplier;
+            float dX = speed * TimeManager.deltaTime() / zIndex;
 
-            // bounds = sprite.getGlobalBounds();
+            position = Vector2f.add(
+                position, new Vector2f(dX * d, 0)
+            );
 
-            // boolean offL = bounds.left < view.left - loopFrequency;
-            // boolean offR = bounds.left >= view.left + view.width;
-            // boolean offscreen = offL || offR;
+            boolean offL = position.x < view.left - loopFrequency;
+            boolean offR = position.x >= view.left + view.width;
+            boolean offscreen = offL || offR;
 
-            // if (offscreen) {
-            // int d = direction.directionMultiplier;
-            // sprite.move(loopFrequency * -d, 0);
-            // }
+            if (offscreen) {
+                position = Vector2f.add(
+                    position, new Vector2f(loopFrequency * -d, 0)
+                );
+            }
         }
 
         /**
@@ -104,36 +143,86 @@ public class ParallaxBackground implements Drawable, Updatable {
          * @param view   current viewrect of the target
          */
         public void draw(RenderTarget target, RenderStates states, FloatRect view) {
-            // sprite.draw(target, states);
+            va = new VertexArray(PrimitiveType.QUADS);
 
-            // int d = direction.directionMultiplier;
-            // float viewRight = view.left + view.width;
-            // float loopX = bounds.left;
+            addToVertexArray();
 
-            // /*
-            // * if there is space (on the left or right) for another
-            // * instance to be drawn
-            // * only one of these is used, dependent on direction,
-            // * hence &= direction
-            // */
-            // boolean spaceLeft = loopX <= viewRight - bounds.width;
-            // spaceLeft &= direction == Direction.LEFT;
-            // boolean spaceRight = loopX > view.left;
-            // spaceRight &= direction == Direction.RIGHT;
+            int d = direction.directionMultiplier;
+            float viewRight = view.left + view.width;
+            float loopX = position.x;
 
-            // /*
-            // * if space on the relevant side (dependent on direction)
-            // * continue drawing more instances until no more space
-            // */
-            // while (spaceLeft ^ spaceRight) {
-            // float newX = loopX - d * loopFrequency;
-            // loopSprite.setPosition(newX, bounds.top);
-            // loopSprite.draw(target, states);
-            // loopX = loopSprite.getGlobalBounds().left;
-            // // update space flags, no need to recheck direction
-            // spaceLeft &= loopX <= viewRight - bounds.width;
-            // spaceRight &= loopX > view.left;
+            /*
+            * if there is space (on the left or right) for another
+            * instance to be drawn
+            * only one of these is used, dependent on direction,
+            * hence &= direction
+            */
+            boolean spaceLeft = loopX <= viewRight - size.x;
+            spaceLeft &= direction == Direction.LEFT;
+            boolean spaceRight = loopX > view.left;
+            spaceRight &= direction == Direction.RIGHT;
+
+            /*
+            * if space on the relevant side (dependent on direction)
+            * continue drawing more instances until no more space
+            */
+            while (spaceLeft ^ spaceRight) {
+                loopX -= d * loopFrequency;
+                Vector2f drawOffset = new Vector2f(loopX, position.y);
+                addToVertexArray(drawOffset);
+                // update space flags, no need to recheck direction
+                spaceLeft &= loopX <= viewRight - size.x;
+                spaceRight &= loopX > view.left;
+            }
+
+            addToVertexMap();
+
+            // VertexArray va = new VertexArray(PrimitiveType.QUADS);
+
+            // for (int i = 0; i < 4; i++) {
+            //     Vector2f positionOffset = Vector2f.componentwiseMul(size, vertexOrder[i]);
+            //     Vector2f vPos = Vector2f.add(position, positionOffset);
+
+            //     Vector2f textureOffset = Vector2f.componentwiseMul(textureDimensions, vertexOrder[i]);
+            //     Vector2f vTex = Vector2f.add(textureStart, textureOffset);
+
+            //     Vertex v = new Vertex(vPos, vTex);
+            //     va.add(v);
             // }
+
+            // RenderStates rs = new RenderStates(BlendMode.ALPHA);
+            // rs = new RenderStates(rs, globalTextures.get(globalTextureIndex));
+            // va.draw(target, rs);
+            // System.out.println("*****");
+        }
+
+        private void addToVertexArray() {
+            addToVertexArray(Vector2f.ZERO);
+        }
+
+        private void addToVertexArray(Vector2f offset) {
+            for (int i = 0; i < 4; i++) {
+                Vector2f positionOffset = Vector2f.componentwiseMul(size, vertexOrder[i]);
+                positionOffset = Vector2f.add(positionOffset, offset);
+                Vector2f vPos = Vector2f.add(position, positionOffset);
+
+                Vector2f textureOffset = Vector2f.componentwiseMul(textureDimensions, vertexOrder[i]);
+                Vector2f vTex = Vector2f.add(textureStart, textureOffset);
+
+                Vertex v = new Vertex(vPos, vTex);
+                va.add(v);
+                if (va.size() == 28)
+                    System.out.println(va.get(27).position);
+            }
+            // System.out.println(va);
+            // System.out.println("***");
+        }
+
+        private void addToVertexMap() {
+            if (!verticesToDraw.containsKey(globalTextureIndex))
+                verticesToDraw.put(globalTextureIndex, new VertexArray());
+            
+            verticesToDraw.get(globalTextureIndex).addAll(va);
         }
     }
 
@@ -162,7 +251,7 @@ public class ParallaxBackground implements Drawable, Updatable {
     private RenderTarget target;
 
     private ArrayList<Texture> globalTextures;
-    private ArrayList<VertexArray> verticesToDraw;
+    private HashMap<Integer, VertexArray> verticesToDraw;
 
     /**
      * Create a new parallax background with direction and speed
@@ -198,7 +287,25 @@ public class ParallaxBackground implements Drawable, Updatable {
         }
         globalTextures.add(tex);
 
-        this.verticesToDraw = new ArrayList<>();
+        verticesToDraw = new HashMap<>();
+    }
+
+    /**
+     * Put a background element into the hashmap used for drawing
+     * Ensure layer order is maintained if a new layer is added
+     * @param e element to put
+     * @param zIndex z index of the element
+     */
+    private void putElement(BackgroundElement e, int zIndex) {
+        if (!elements.containsKey(zIndex)) {
+            elements.put(zIndex, new ArrayList<>());
+
+            zLayers.add(zIndex);
+            Collections.sort(zLayers);
+            Collections.reverse(zLayers);
+        }
+
+        elements.get(zIndex).add(e);
     }
 
     public void addElement(Sprite s, int zIndex, Vector2f startPos) {
@@ -206,6 +313,8 @@ public class ParallaxBackground implements Drawable, Updatable {
     }
 
     public void addElement(Sprite s, int zIndex, Vector2f startPos, float loopFrequency) {
+        if (zIndex <= 0) throw new InvalidIndexException(zIndex);
+        
         // get texture + rect
 
         Texture t = (Texture) s.getTexture();
@@ -214,14 +323,26 @@ public class ParallaxBackground implements Drawable, Updatable {
         // add texture to global (returns Vector3f - (x,y,i))
 
         Vector3f texPos = addToGlobal(t);
-        // System.out.println(texPos);
-
+        
         // get sprite bounds
 
+        s.setPosition(startPos);
         FloatRect bounds = s.getGlobalBounds();
 
-        // create BackgroundElement with bounds, textureID, texture Coords, zIndex,
-        // loopFrequency
+        // create BackgroundElement with bounds, textureID, texture Coords, zIndex, loopFrequency
+
+        Vector2f textureStart = new Vector2f(texPos.x, texPos.y);
+        textureStart = Vector2f.add(textureStart, new Vector2f(texRect.left, texRect.top));
+        Vector2f textureDim = new Vector2f(texRect.width, texRect.height);
+        if (textureDim.equals(Vector2f.ZERO))
+            textureDim = new Vector2f(s.getLocalBounds().width, s.getLocalBounds().height);
+        FloatRect textureCoords = new FloatRect(textureStart, textureDim);
+        BackgroundElement element = new BackgroundElement(
+            bounds, zIndex, loopFrequency,
+            (int)texPos.z, textureCoords
+        );
+        
+        putElement(element, zIndex);
     }
 
     public void addElement(VertexArray v, int zIndex) {
@@ -333,10 +454,19 @@ public class ParallaxBackground implements Drawable, Updatable {
     @Override
     public void draw(RenderTarget target, RenderStates states) {
         FloatRect vBounds = getViewRect(this.target);
+        verticesToDraw.clear();
         
         for (int i : zLayers)
             for (BackgroundElement e : elements.get(i))
                 e.draw(target, states, vBounds);
+
+        for (int i : verticesToDraw.keySet()) {
+            RenderStates rs = new RenderStates(BlendMode.ALPHA);
+            rs = new RenderStates(rs, globalTextures.get(i));
+            verticesToDraw.get(i).draw(target, rs);
+        }
+
+        System.out.println(verticesToDraw);
     }
 
     /**
