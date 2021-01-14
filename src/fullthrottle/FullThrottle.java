@@ -21,10 +21,12 @@ import org.jsfml.window.VideoMode;
 import org.jsfml.window.WindowStyle;
 import org.jsfml.window.event.Event;
 
+import fullthrottle.gfx.Animation;
 import fullthrottle.gfx.FTTexture;
 import fullthrottle.gfx.ParallaxBackground;
 import fullthrottle.gfx.ParallaxBackground.Direction;
 import fullthrottle.gfx.Renderer;
+import fullthrottle.gfx.SpriteSequence;
 import fullthrottle.sfx.FTMusic;
 import fullthrottle.ui.Button;
 import fullthrottle.ui.Button.ActionType;
