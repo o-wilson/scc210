@@ -176,7 +176,7 @@ public class FullThrottle {
 
 
         // BACKGROUND TEST
-        ParallaxBackground bg = new ParallaxBackground(window, Direction.LEFT, 700);
+        ParallaxBackground bg = new ParallaxBackground(window, Direction.LEFT, 3000);
 
         Texture sky = new FTTexture("./res/BackgroundTest/Sky.png");
         Texture buildings = new FTTexture("./res/BackgroundTest/Buildings.png");
@@ -204,6 +204,17 @@ public class FullThrottle {
 
         updatables.add(bg);
         Renderer.addDrawable(bg, 1000);
+
+
+
+        //Sequence/Animation Test
+        Texture carSprites = new FTTexture("./res/AnimationTest.png");
+        Vector2i fS = new Vector2i(32, 32);
+        SpriteSequence carSeq = new SpriteSequence(carSprites, fS);
+        Animation carAnim = new Animation(carSeq, 8);
+        Renderer.addDrawable(carAnim);
+        carAnim.setScale(new Vector2f(5, 5));
+        carAnim.setPosition(new Vector2f(900, 450));
     }
 
     private void update() {
