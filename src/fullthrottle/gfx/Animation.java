@@ -20,19 +20,26 @@ public class Animation extends Sprite {
 
     private boolean paused;
 
-    public Animation(SpriteSequence sprites, int framerate) {
+    private boolean loops;
+
+    public Animation(SpriteSequence sprites, int framerate, boolean loops) {
         super(sprites.getSequence().get(0).getTexture());
         
         this.sprites = sprites.getSequence();
         this.framerate = framerate;
         this.currentAnimationFrame = 0;
         this.timeSinceLastChange = 0;
+        this.loops = loops;
 
         this.paused = false;
     }
 
     public void setFramerate(int framerate) {
         this.framerate = framerate;
+    }
+
+    public void setSprites(SpriteSequence sprites) {
+        setSprites(sprites.getSequence());
     }
 
     public void setSprites(ArrayList<Sprite> sprites) {
@@ -47,20 +54,47 @@ public class Animation extends Sprite {
         this.paused = false;
     }
 
+    public void restart() {
+        setCurrentFrame(0);
+    }
+
+    public void jumpToEnd() {
+        setCurrentFrame(sprites.size()-1);
+    }
+
+    public int getCurrentFrame() {
+        return currentAnimationFrame;
+    }
+
+    public void setCurrentFrame(int frame) {
+        currentAnimationFrame = frame;
+    }
+
+    public int getLength() {
+        return sprites.size();
+    }
+
     @Override
     public void draw(RenderTarget arg0, RenderStates arg1) {
-        if (!paused) {
+        boolean update = !loops;
+        update &= currentAnimationFrame == sprites.size() - 1;
+        update = !update;
+            
+        if (!paused && update) {
             timeSinceLastChange += TimeManager.deltaTime();
             float timeUntilChange = 1f / framerate;
             if (timeSinceLastChange >= timeUntilChange) {
                 timeSinceLastChange -= timeUntilChange;
                 currentAnimationFrame++;
-                currentAnimationFrame %= sprites.size();
+                if (loops)
+                    currentAnimationFrame %= sprites.size();
             }
         }
 
         sprites.get(currentAnimationFrame).draw(arg0, arg1);
     }
+
+
 
     @Override
     public void setColor(Color arg0) {
