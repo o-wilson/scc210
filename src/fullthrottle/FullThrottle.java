@@ -155,13 +155,10 @@ public class FullThrottle {
         Renderer.addDrawable(settingsButton);
         buttonManager.addObserver(settingsButton);
 
-        Button playButton = new Button(
-            Vector2f.ZERO, new Vector2i(196, 96)
+        //Play Button test
+        Button playButton = new PlayButton(
+            Vector2f.ZERO, new Vector2i(192, 96)
         );
-        float playButtonX = (WINDOW_WIDTH - playButton.getWidth()) /2;
-        playButton.setPosition(playButtonX, 400);
-        playButton.addAction(this, "play", ActionType.LEFT_CLICK);
-        Renderer.addDrawable(playButton);
         buttonManager.addObserver(playButton);
 
         Button testButton = new Button(
@@ -213,7 +210,7 @@ public class FullThrottle {
         Texture carSprites = new FTTexture("./res/AnimationTest.png");
         Vector2i fS = new Vector2i(32, 32);
         SpriteSequence carSeq = new SpriteSequence(carSprites, fS);
-        Animation carAnim = new Animation(carSeq, 8);
+        Animation carAnim = new Animation(carSeq, 8, true);
         Renderer.addDrawable(carAnim);
         carAnim.setScale(new Vector2f(5, 5));
         carAnim.setPosition(new Vector2f(900, 450));
@@ -238,6 +235,10 @@ public class FullThrottle {
 
     public void play() {
         System.out.println("Play game");
+    }
+
+    public void playEnter() {
+        
     }
 
     public void testEnabled() {
