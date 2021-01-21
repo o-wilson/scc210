@@ -197,8 +197,8 @@ public class FullThrottle {
         bg.addElement(bushS, 5, new Vector2f(1000, 506.25f), 500);*/
         Texture longRoad = new FTTexture("./res/RoadFull.png");
         Sprite fullRoadS = new Sprite(longRoad);
-        fullRoadS.scale(2.8125f, 2.8125f);
-        bg.addElement(fullRoadS, 5, Vector2f.ZERO);
+        fullRoadS.scale(5.8125f, 5.8125f);
+        bg.addElement(fullRoadS, 5, new Vector2f(0, 300f));
 
         //Added stuff for the audio
         menu_music.play();
