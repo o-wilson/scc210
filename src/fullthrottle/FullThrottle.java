@@ -177,24 +177,24 @@ public class FullThrottle {
         // BACKGROUND TEST
         ParallaxBackground bg = new ParallaxBackground(window, Direction.LEFT, 3000);
 
-        /*Texture sky = new FTTexture("./res/BackgroundTest/Sky.png");
+        Texture sky = new FTTexture("./res/BackgroundTest/Sky.png");
         Texture buildings = new FTTexture("./res/BackgroundTest/Buildings.png");
-        Texture road = new FTTexture("./res/BackgroundTest/Road.png");
+        //Texture road = new FTTexture("./res/BackgroundTest/Road.png");
         Texture bush = new FTTexture("./res/BackgroundTest/Bush.png");
 
         Sprite skyS = new Sprite(sky);
         skyS.scale(2.8125f, 2.8125f);
         Sprite buildingsS = new Sprite(buildings);
         buildingsS.scale(2.8125f, 2.8125f);
-        Sprite roadS = new Sprite(road);
-        roadS.scale(2.8125f, 2.8125f);
+        //Sprite roadS = new Sprite(road);
+        //roadS.scale(2.8125f, 2.8125f);
         Sprite bushS = new Sprite(bush);
         bushS.scale(2.8125f, 2.8125f);
 
         bg.addElement(skyS, 30, Vector2f.ZERO);
         bg.addElement(buildingsS, 15, Vector2f.ZERO);
-        bg.addElement(roadS, 5, Vector2f.ZERO);
-        bg.addElement(bushS, 5, new Vector2f(1000, 506.25f), 500);*/
+        //bg.addElement(roadS, 5, Vector2f.ZERO);
+        bg.addElement(bushS, 4, new Vector2f(1000, 640f), 500);
         Texture longRoad = new FTTexture("./res/RoadFull.png");
         Sprite fullRoadS = new Sprite(longRoad);
         fullRoadS.scale(5.8125f, 5.8125f);
