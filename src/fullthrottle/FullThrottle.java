@@ -217,7 +217,7 @@ public class FullThrottle {
         Animation carAnim = new Animation(carSeq, 8, true);
         Renderer.addDrawable(carAnim);
         carAnim.setScale(new Vector2f(5, 5));
-        carAnim.setPosition(new Vector2f(900, 450));
+        carAnim.setPosition(new Vector2f(20, 400));
     }
 
     private void update() {
