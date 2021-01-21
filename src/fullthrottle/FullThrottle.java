@@ -177,7 +177,7 @@ public class FullThrottle {
         // BACKGROUND TEST
         ParallaxBackground bg = new ParallaxBackground(window, Direction.LEFT, 3000);
 
-        Texture sky = new FTTexture("./res/BackgroundTest/Sky.png");
+        /*Texture sky = new FTTexture("./res/BackgroundTest/Sky.png");
         Texture buildings = new FTTexture("./res/BackgroundTest/Buildings.png");
         Texture road = new FTTexture("./res/BackgroundTest/Road.png");
         Texture bush = new FTTexture("./res/BackgroundTest/Bush.png");
@@ -194,7 +194,11 @@ public class FullThrottle {
         bg.addElement(skyS, 30, Vector2f.ZERO);
         bg.addElement(buildingsS, 15, Vector2f.ZERO);
         bg.addElement(roadS, 5, Vector2f.ZERO);
-        bg.addElement(bushS, 5, new Vector2f(1000, 506.25f), 500);
+        bg.addElement(bushS, 5, new Vector2f(1000, 506.25f), 500);*/
+        Texture longRoad = new FTTexture("./res/RoadFull.png");
+        Sprite fullRoadS = new Sprite(longRoad);
+        fullRoadS.scale(2.8125f, 2.8125f);
+        bg.addElement(fullRoadS, 5, Vector2f.ZERO);
 
         //Added stuff for the audio
         menu_music.play();
