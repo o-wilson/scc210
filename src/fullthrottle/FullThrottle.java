@@ -94,6 +94,9 @@ public class FullThrottle {
                     Input.keyEvent(event);
                 }
             }
+            if (Input.getKeyDown(Key.W)){
+                
+            }
             
             update();
 
@@ -132,7 +135,7 @@ public class FullThrottle {
         // drawables = new ArrayList<>();
         updatables = new ArrayList<>();
 
-        Texture titleT = new FTTexture("./res/Title.png");
+        /*Texture titleT = new FTTexture("./res/Title.png");
         Texture settingsT = new FTTexture("./res/Settings.png");
 
         Texture squareButton = new FTTexture("./res/SquareButton.png");
@@ -171,7 +174,7 @@ public class FullThrottle {
         buttonManager.addObserver(testButton);
         Renderer.addDrawable(testButton);
 
-        playButton.addAction(testButton, "toggleEnabled", ActionType.RIGHT_CLICK);
+        playButton.addAction(testButton, "toggleEnabled", ActionType.RIGHT_CLICK);*/
 
 
         // BACKGROUND TEST
