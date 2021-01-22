@@ -159,4 +159,9 @@ public final class Renderer {
 
         objects.get(rL).add(o);
     }
+
+    public static void clear() {
+        objects.clear();
+        renderLayers.clear();
+    }
 }

@@ -27,6 +27,7 @@ import fullthrottle.gfx.ParallaxBackground;
 import fullthrottle.gfx.ParallaxBackground.Direction;
 import fullthrottle.gfx.Renderer;
 import fullthrottle.gfx.SpriteSequence;
+import fullthrottle.gfx.Spritesheet;
 import fullthrottle.sfx.FTMusic;
 import fullthrottle.ui.Button;
 import fullthrottle.ui.Button.ActionType;
@@ -210,6 +211,22 @@ public class FullThrottle {
         Renderer.addDrawable(carAnim);
         carAnim.setScale(new Vector2f(5, 5));
         carAnim.setPosition(new Vector2f(20, 400));
+
+
+
+        // Spritesheet demo
+
+        Renderer.clear();
+
+        Texture roadSheet = new FTTexture("./res/Road.png");
+        Spritesheet sheet = new Spritesheet(roadSheet, new Vector2i(16, 16));
+
+        for (int i = 0; i < 27; i++) {
+            Sprite s = sheet.getSprite(i);
+            s.scale(3, 3);
+            s.setPosition(32 + 54 * (i % 9), 32 + 54 * (i / 9));
+            Renderer.addDrawable(s);
+        }
     }
 
     private void update() {
