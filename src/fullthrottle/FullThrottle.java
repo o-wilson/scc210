@@ -114,7 +114,7 @@ public class FullThrottle {
     }
 
     private void start() {
-
+        //Initialisation
         window = new RenderWindow(
             new VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT),
             "Full Throttle",
@@ -132,23 +132,22 @@ public class FullThrottle {
 
         buttonManager = ButtonManager.getInstance();
 
-        // drawables = new ArrayList<>();
         updatables = new ArrayList<>();
 
-        /*Texture titleT = new FTTexture("./res/Title.png");
-        Texture settingsT = new FTTexture("./res/Settings.png");
 
-        Texture squareButton = new FTTexture("./res/SquareButton.png");
-        Texture squareButtonDisabled = new FTTexture("./res/SquareButtonDisabled.png");
-        
-        Sprite tButton = new Sprite(squareButton);
-        Sprite tButtonDisabled = new Sprite(squareButtonDisabled);
 
+        //Title
+        Texture titleT = new FTTexture("./res/Title.png");
         Sprite titleS = new Sprite(titleT);
         Renderer.addDrawable(titleS);
         float titleW = titleS.getGlobalBounds().width;
         titleS.setPosition((WINDOW_WIDTH - titleW) / 2, 50);
 
+
+
+        //Buttons
+
+        Texture settingsT = new FTTexture("./res/Settings.png");
         Sprite settingsS = new Sprite(settingsT);
         Button settingsButton = new Button(
             new Vector2f(10, 10), new Vector2i(64, 64),
@@ -158,23 +157,16 @@ public class FullThrottle {
         Renderer.addDrawable(settingsButton);
         buttonManager.addObserver(settingsButton);
 
-        //Play Button test
         Button playButton = new PlayButton(
             Vector2f.ZERO, new Vector2i(192, 96)
         );
         buttonManager.addObserver(playButton);
 
-        Button testButton = new Button(
-            new Vector2f(400, 400), new Vector2i(128, 128),
-            tButton, UI.SpriteFillMode.STRETCH
+        Button highScoresButton = new HighScoresButton(
+            Vector2f.ZERO, new Vector2i(192, 96)
         );
-        testButton.setDisabledSprite(tButtonDisabled);
-        testButton.addAction(this, "testEnabled", ActionType.LEFT_CLICK);
-        testButton.addAction(this, "testDisabled", ActionType.LEFT_CLICK, false);
-        buttonManager.addObserver(testButton);
-        Renderer.addDrawable(testButton);
+        buttonManager.addObserver(highScoresButton);
 
-        playButton.addAction(testButton, "toggleEnabled", ActionType.RIGHT_CLICK);*/
 
 
         // BACKGROUND TEST
@@ -182,34 +174,31 @@ public class FullThrottle {
 
         Texture sky = new FTTexture("./res/BackgroundTest/Sky.png");
         Texture buildings = new FTTexture("./res/BackgroundTest/Buildings.png");
-        //Texture road = new FTTexture("./res/BackgroundTest/Road.png");
+        Texture road = new FTTexture("./res/BackgroundTest/Road.png");
         Texture bush = new FTTexture("./res/BackgroundTest/Bush.png");
 
         Sprite skyS = new Sprite(sky);
         skyS.scale(2.8125f, 2.8125f);
         Sprite buildingsS = new Sprite(buildings);
         buildingsS.scale(2.8125f, 2.8125f);
-        //Sprite roadS = new Sprite(road);
-        //roadS.scale(2.8125f, 2.8125f);
+        Sprite roadS = new Sprite(road);
+        roadS.scale(2.8125f, 2.8125f);
         Sprite bushS = new Sprite(bush);
         bushS.scale(2.8125f, 2.8125f);
 
         bg.addElement(skyS, 30, Vector2f.ZERO);
         bg.addElement(buildingsS, 15, Vector2f.ZERO);
-        //bg.addElement(roadS, 5, Vector2f.ZERO);
-        bg.addElement(bushS, 4, new Vector2f(1000, 640f), 500);
-        Texture longRoad = new FTTexture("./res/RoadFull.png");
-        Sprite fullRoadS = new Sprite(longRoad);
-        fullRoadS.scale(5.8125f, 5.8125f);
-        bg.addElement(fullRoadS, 5, new Vector2f(0, 300f));
+        bg.addElement(roadS, 5, Vector2f.ZERO);
+        bg.addElement(bushS, 5, new Vector2f(1000, 506.25f), 500);
+        
+        updatables.add(bg);
+        Renderer.addDrawable(bg, 1000);
+
+
 
         //Added stuff for the audio
         menu_music.play();
         //END of added stuff for the audio
-
-
-        updatables.add(bg);
-        Renderer.addDrawable(bg, 1000);
 
 
 
@@ -238,22 +227,6 @@ public class FullThrottle {
 
     public void settings() {
         System.out.println("Settings clicked");
-    }
-
-    public void play() {
-        System.out.println("Play game");
-    }
-
-    public void playEnter() {
-        
-    }
-
-    public void testEnabled() {
-        System.out.println("Button is enabled");
-    }
-
-    public void testDisabled() {
-        System.out.println("Button is disabled");
     }
 
     public static void main(String[] args) {

@@ -11,21 +11,15 @@ import fullthrottle.gfx.Renderer;
 import fullthrottle.gfx.SpriteSequence;
 import fullthrottle.ui.Button;
 
-public class PlayButton extends Button {
+public final class PlayButton extends Button {
     private Animator playButtonAnimator;
-
-    private boolean created;
 
     public PlayButton(Vector2f pos, Vector2i size) {
         super(pos, size);
-        created = false;
         createButton();
     }
 
     private void createButton() {
-        if (created) return;
-        created = true;
-
         Texture pEnter = new FTTexture("./res/PlayButtonEnter.png");
         Texture pExit = new FTTexture("./res/PlayButtonExit.png");
         Texture pIdle = new FTTexture("./res/PlayButtonIdle.png");
@@ -49,7 +43,7 @@ public class PlayButton extends Button {
             Vector2i.componentwiseDiv(playButtonSize, frameSize)
         ));
 
-        float playButtonX = (FullThrottle.WINDOW_WIDTH - this.getWidth()) /2;
+        float playButtonX = (FullThrottle.WINDOW_WIDTH - this.getWidth()) / 2;
         this.setPosition(playButtonX, 400);
 
         this.setSprite(playButtonAnimator);
@@ -57,6 +51,7 @@ public class PlayButton extends Button {
         this.addAction(this, "playButtonLeftClick", ActionType.LEFT_CLICK);
         this.addAction(this, "playButtonEnter", ActionType.ENTER);
         this.addAction(this, "playButtonExit", ActionType.EXIT);
+        
         Renderer.addDrawable(this);
     }
 
