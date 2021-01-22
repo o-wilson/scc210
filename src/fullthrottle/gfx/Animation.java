@@ -3,7 +3,6 @@ package fullthrottle.gfx;
 import java.util.ArrayList;
 
 import org.jsfml.graphics.Color;
-import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;

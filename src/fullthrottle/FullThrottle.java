@@ -204,29 +204,31 @@ public class FullThrottle {
 
 
         //Sequence/Animation Test
-        Texture carSprites = new FTTexture("./res/AnimationTest.png");
-        Vector2i fS = new Vector2i(32, 32);
-        SpriteSequence carSeq = new SpriteSequence(carSprites, fS);
+        Spritesheet carSheet = new Spritesheet(
+            new  FTTexture("./res/AnimationTest.png"),
+            new Vector2i(32, 32)
+        );
+        SpriteSequence carSeq = new SpriteSequence(carSheet);
         Animation carAnim = new Animation(carSeq, 8, true);
         Renderer.addDrawable(carAnim);
         carAnim.setScale(new Vector2f(5, 5));
-        carAnim.setPosition(new Vector2f(20, 400));
+        carAnim.setPosition(new Vector2f(900, 450));
 
 
 
         // Spritesheet demo
 
-        Renderer.clear();
+        // Renderer.clear();
 
-        Texture roadSheet = new FTTexture("./res/Road.png");
-        Spritesheet sheet = new Spritesheet(roadSheet, new Vector2i(16, 16));
+        // Texture roadSheet = new FTTexture("./res/Road.png");
+        // Spritesheet sheet = new Spritesheet(roadSheet, new Vector2i(16, 16));
 
-        for (int i = 0; i < 27; i++) {
-            Sprite s = sheet.getSprite(i);
-            s.scale(3, 3);
-            s.setPosition(32 + 54 * (i % 9), 32 + 54 * (i / 9));
-            Renderer.addDrawable(s);
-        }
+        // for (int i = 0; i < 27; i++) {
+        //     Sprite s = sheet.getSprite(i);
+        //     s.scale(3, 3);
+        //     s.setPosition(32 + 54 * (i % 9), 32 + 54 * (i / 9));
+        //     Renderer.addDrawable(s);
+        // }
     }
 
     private void update() {

@@ -9,6 +9,7 @@ import fullthrottle.gfx.Animator;
 import fullthrottle.gfx.FTTexture;
 import fullthrottle.gfx.Renderer;
 import fullthrottle.gfx.SpriteSequence;
+import fullthrottle.gfx.Spritesheet;
 import fullthrottle.ui.Button;
 
 public final class HighScoresButton extends Button {
@@ -20,13 +21,13 @@ public final class HighScoresButton extends Button {
     }
 
     private void createButton() {
-        Texture enter = new FTTexture("./res/HighScoresButtonEnter.png");
-        Texture exit = new FTTexture("./res/HighScoresButtonExit.png");
-        Texture idle = new FTTexture("./res/HighScoresButtonIdle.png");
         Vector2i frameSize = new Vector2i(64, 32);
-        SpriteSequence enterSequence = new SpriteSequence(enter, frameSize);
-        SpriteSequence exitSequence = new SpriteSequence(exit, frameSize);
-        SpriteSequence idleSequence = new SpriteSequence(idle, frameSize);
+        Texture source = new FTTexture("./res/HighScoresButton.png");
+        Spritesheet sheet = new Spritesheet(source, frameSize);
+
+        SpriteSequence idleSequence = new SpriteSequence(sheet, 0, 0);
+        SpriteSequence enterSequence = new SpriteSequence(sheet, 7, 13);
+        SpriteSequence exitSequence = new SpriteSequence(sheet, 14, 20);
         Animation enterAnim = new Animation(enterSequence, 15, false);
         Animation exitAnim = new Animation(exitSequence, 15, false);
         Animation idleAnim = new Animation(idleSequence, 1, false);

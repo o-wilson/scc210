@@ -2,7 +2,6 @@ package fullthrottle.gfx;
 
 import java.util.HashMap;
 
-import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Texture;
@@ -91,9 +90,9 @@ public class Spritesheet {
     }
 
     public Sprite getSprite(int index) {
-        if (index >= sheetDimensions.x * sheetDimensions.y)
+        if (index >= getLength())
             throw new InvalidSpriteIndexException(
-                index, sheetDimensions.x * sheetDimensions.y
+                index, getLength()
             );
 
         if (storedSprites.keySet().contains(index))
@@ -120,6 +119,10 @@ public class Spritesheet {
 
         storedSprites.put(index, s);
         return s;
+    }
+
+    public int getLength() {
+        return sheetDimensions.x * sheetDimensions.y;
     }
 
     private class InvalidSpriteSizeException extends RuntimeException {

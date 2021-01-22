@@ -9,6 +9,7 @@ import fullthrottle.gfx.Animator;
 import fullthrottle.gfx.FTTexture;
 import fullthrottle.gfx.Renderer;
 import fullthrottle.gfx.SpriteSequence;
+import fullthrottle.gfx.Spritesheet;
 import fullthrottle.ui.Button;
 
 public final class PlayButton extends Button {
@@ -20,13 +21,13 @@ public final class PlayButton extends Button {
     }
 
     private void createButton() {
-        Texture pEnter = new FTTexture("./res/PlayButtonEnter.png");
-        Texture pExit = new FTTexture("./res/PlayButtonExit.png");
-        Texture pIdle = new FTTexture("./res/PlayButtonIdle.png");
         Vector2i frameSize = new Vector2i(64, 32);
-        SpriteSequence enterSequence = new SpriteSequence(pEnter, frameSize);
-        SpriteSequence exitSequence = new SpriteSequence(pExit, frameSize);
-        SpriteSequence idleSequence = new SpriteSequence(pIdle, frameSize);
+        Texture source = new FTTexture("./res/PlayButton.png");
+        Spritesheet sheet = new Spritesheet(source, frameSize);
+
+        SpriteSequence idleSequence = new SpriteSequence(sheet, 0, 0);
+        SpriteSequence enterSequence = new SpriteSequence(sheet, 7, 13);
+        SpriteSequence exitSequence = new SpriteSequence(sheet, 14, 20);
         Animation playEnterAnim = new Animation(enterSequence, 15, false);
         Animation playExitAnim = new Animation(exitSequence, 15, false);
         Animation playIdleAnim = new Animation(idleSequence, 1, false);
