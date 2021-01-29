@@ -3,6 +3,7 @@ package fullthrottle.gfx;
 import java.util.ArrayList;
 
 import org.jsfml.graphics.Color;
+import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
@@ -128,5 +129,10 @@ public class Animation extends Sprite {
         for (Sprite s : sprites)
             s.setScale(arg0);
         super.setScale(arg0);
+    }
+
+    @Override
+    public FloatRect getGlobalBounds() {
+        return sprites.get(currentAnimationFrame).getGlobalBounds();
     }
 }
