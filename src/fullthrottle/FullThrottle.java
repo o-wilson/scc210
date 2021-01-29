@@ -29,6 +29,8 @@ import fullthrottle.gfx.Renderer;
 import fullthrottle.gfx.SpriteSequence;
 import fullthrottle.gfx.Spritesheet;
 import fullthrottle.sfx.FTMusic;
+import fullthrottle.shop.UpgradeMarker;
+import fullthrottle.shop.UpgradePath;
 import fullthrottle.ui.Button;
 import fullthrottle.ui.Button.ActionType;
 import fullthrottle.ui.ButtonManager;
@@ -46,7 +48,7 @@ public class FullThrottle {
 
     private ButtonManager buttonManager;
     //Music stuff don't touch for now pls Java garbage collection is making a problems 
-    Music menu_music = new FTMusic("./res/Music/scorched_earth_original.ogg");
+    // Music menu_music = new FTMusic("./res/Music/scorched_earth_original.ogg");
     //
 
     // private ArrayList<Drawable> drawables;
@@ -198,7 +200,7 @@ public class FullThrottle {
 
 
         //Added stuff for the audio
-        menu_music.play();
+        // menu_music.play();
         //END of added stuff for the audio
 
 
@@ -229,6 +231,32 @@ public class FullThrottle {
         //     s.setPosition(32 + 54 * (i % 9), 32 + 54 * (i / 9));
         //     Renderer.addDrawable(s);
         // }
+
+
+
+        // Shop demo
+
+        Renderer.clear();
+        
+        // for (int i = 0; i < 5; i++) {
+        //     UpgradeMarker uM = new UpgradeMarker(new Vector2f(64, 64), new Vector2f(400 + (i*76), 400));
+        //     Renderer.addDrawable(uM);
+        //     if (i==1)
+        //         uM.unlock();
+
+        //     if (i==0)
+        //         uM.buy();
+        // }
+        Texture source = new FTTexture("./res/shop/Upgrades.png");
+        Spritesheet icons = new Spritesheet(source, new Vector2i(32, 32));
+        for (int i = 0; i < 5; i++) {
+            UpgradePath uP = new UpgradePath("Fuel" + i, icons.getSprite(i), new int[] {5, 10, 15, 20, 25}, new Vector2f(400, 32 + (i*128)), new Vector2f(128, 128));
+            Renderer.addDrawable(uP);
+
+            for (int j = 0; j < i; j++) {
+                uP.buyNext();
+            }
+        }
     }
 
     private void update() {
