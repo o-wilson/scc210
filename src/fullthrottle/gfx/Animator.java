@@ -97,6 +97,8 @@ public class Animator extends Sprite {
 
     @Override
     public FloatRect getGlobalBounds() {
+        if (currentAnimation == null)
+            throw new NoSuchAnimationException();
         return currentAnimation.getGlobalBounds();
     }
 }
