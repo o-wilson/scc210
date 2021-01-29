@@ -6,22 +6,17 @@ import org.jsfml.graphics.Drawable;
 import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
-import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Text;
 import org.jsfml.system.Vector2f;
-import org.jsfml.system.Vector2i;
 
-import fullthrottle.gfx.Spritesheet;
+import fullthrottle.gfx.Animation;
 import fullthrottle.shop.UpgradeButton.ButtonType;
 import fullthrottle.ui.Button;
-import fullthrottle.ui.ButtonManager;
 import fullthrottle.ui.UI;
-import fullthrottle.ui.Button.ActionType;
-import fullthrottle.ui.UI.SpriteFillMode;
 
 public class UpgradePath implements Drawable {
     private String name;
-    private Sprite icon;
+    private Animation icon;
 
     private int currentStage;
     private int stages;
@@ -34,7 +29,7 @@ public class UpgradePath implements Drawable {
     private ArrayList<UpgradeMarker> markers;
 
     public UpgradePath(
-        String name, Sprite icon, int[] prices,
+        String name, Animation icon, int[] prices,
         Vector2f pos, Vector2f iconSize
     ) {
         if (prices.length <= 0)
@@ -53,12 +48,13 @@ public class UpgradePath implements Drawable {
         Vector2f cSize = new Vector2f(
             iconBounds.width, iconBounds.height
         );
-        Vector2f scale = Vector2f.componentwiseDiv(iconSize, cSize);
-        icon.setScale(scale);
+        // Vector2f scale = Vector2f.componentwiseDiv(iconSize, cSize);
+        // icon.setScale(scale);
 
         Vector2f markerSize = Vector2f.div(iconSize, 2);
 
         iconBounds = icon.getGlobalBounds();
+        System.out.println(name + ": " + iconBounds);
         Vector2f markerPos = Vector2f.add(
             pos, new Vector2f(iconBounds.width, (iconBounds.height / 2) - markerSize.y / 2)
         );
@@ -81,6 +77,8 @@ public class UpgradePath implements Drawable {
         bP = Vector2f.add(bP, new Vector2f(bS.x*1.5f, 0));
         up.setPosition(bP);
 
+        icon.jumpToEnd();
+
         // up = new Button(new Vector2f(markerPos.x, pos.y), new Vector2i(iconSize), sheet.getSprite(0), SpriteFillMode.FILL);
         // ButtonManager.getInstance().addObserver(up);
         // up.addAction(this, "sellLast", ActionType.LEFT_CLICK);
@@ -101,6 +99,8 @@ public class UpgradePath implements Drawable {
 
         System.out.println("Bought next stage of " + name + " for " + prices[currentStage] + " coins!");
         markers.get(currentStage).buy();
+        icon.restart();
+        icon.play();
         currentStage++;
         if (currentStage >= stages) return;
         markers.get(currentStage).unlock();

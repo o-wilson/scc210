@@ -1,15 +1,14 @@
 package fullthrottle.shop;
 
+import org.jsfml.graphics.FloatRect;
+import org.jsfml.graphics.Sprite;
+import org.jsfml.graphics.Texture;
 import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 
-import fullthrottle.gfx.Animation;
-import fullthrottle.gfx.Animator;
-import fullthrottle.gfx.SpriteSequence;
-import fullthrottle.gfx.Spritesheet;
+import fullthrottle.gfx.FTTexture;
 import fullthrottle.ui.Button;
 import fullthrottle.ui.ButtonManager;
-import fullthrottle.ui.UI;
 import fullthrottle.ui.UI.SpriteFillMode;
 
 public class UpgradeButton extends Button {
@@ -33,16 +32,16 @@ public class UpgradeButton extends Button {
     ) {
         super(Vector2f.ZERO, new Vector2i(size));
 
-        Spritesheet sheet = new Spritesheet(
-            UI.UPGRADE_BUTTONS_TEXTURE, new Vector2i(32, 32)
+        Texture tex = new FTTexture(
+            "./res/shop/UpgradeButton" + type.spriteIndex + ".png"
         );
 
-        SpriteSequence ss = new SpriteSequence(sheet, type.spriteIndex, type.spriteIndex);
-        Animation a = new Animation(ss, 1, false);
-        Animator anim = new Animator();
-        anim.addAnimation("Default", a);
-        anim.setCurrentAnimation("Default");
-        this.setSprite(anim);
+        Sprite bSprite = new Sprite(tex);
+        FloatRect sB = bSprite.getGlobalBounds();
+        Vector2f sSize = new Vector2f(sB.left, sB.top);
+        Vector2f scale = Vector2f.componentwiseDiv(size, sSize);
+        bSprite.scale(scale);
+        this.setSprite(bSprite);
 
         // this.setSprite(sheet.getSprite(type.spriteIndex));
         this.addAction(path, type.methodName, ActionType.LEFT_CLICK);

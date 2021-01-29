@@ -247,15 +247,21 @@ public class FullThrottle {
         //     if (i==0)
         //         uM.buy();
         // }
+        
+        int[] endPoints = new int[] {7, 14, 25, 35, 44};
+        String[] names = new String[] {"Fuel", "Armour", "Speed", "Increase Health", "Restore Health"};
         Texture source = new FTTexture("./res/shop/Upgrades.png");
-        Spritesheet icons = new Spritesheet(source, new Vector2i(32, 32));
-        for (int i = 0; i < 5; i++) {
-            UpgradePath uP = new UpgradePath("Fuel" + i, icons.getSprite(i), new int[] {5, 10, 15, 20, 25}, new Vector2f(400, 32 + (i*128)), new Vector2f(128, 128));
-            Renderer.addDrawable(uP);
+        Vector2i iconFrameSize = new Vector2i(32, 32);
+        Spritesheet icons = new Spritesheet(source, iconFrameSize);
 
-            for (int j = 0; j < i; j++) {
-                uP.buyNext();
-            }
+        Vector2f iconSize = new Vector2f(128, 128);
+
+        for (int i = 0; i < endPoints.length; i++) {
+            SpriteSequence seq = new SpriteSequence(icons, i * 9, endPoints[i]);
+            Animation iconAnim = new Animation(seq, 15, false);
+            iconAnim.scale(Vector2f.componentwiseDiv(iconSize, new Vector2f(iconFrameSize)));
+            UpgradePath uP = new UpgradePath(names[i], iconAnim, new int[] {5, 10, 15, 20, 25}, new Vector2f(64, 32 + (i*128)), iconSize);
+            Renderer.addDrawable(uP);
         }
     }
 
