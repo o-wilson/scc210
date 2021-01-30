@@ -63,7 +63,6 @@ public class UpgradePath implements Drawable {
 
         // calculate starting position and generate stage markers
         iconBounds = icon.getGlobalBounds();
-        System.out.println(name + ": " + iconBounds);
         Vector2f markerPos = Vector2f.add(
             pos, new Vector2f(
                 iconBounds.width,
@@ -174,6 +173,11 @@ public class UpgradePath implements Drawable {
      * a 0 or negative number of stages
      */
     private class InvalidStageCountException extends RuntimeException {
+        /**
+         *
+         */
+        private static final long serialVersionUID = -1928867194158996212L;
+
         public InvalidStageCountException(int stages) {
             super("Invalid number of stages " + stages + ". Must be >0");
         }
