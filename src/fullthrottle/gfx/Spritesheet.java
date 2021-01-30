@@ -126,6 +126,11 @@ public class Spritesheet {
     }
 
     private class InvalidSpriteSizeException extends RuntimeException {
+        /**
+         *
+         */
+        private static final long serialVersionUID = -1135456920797388134L;
+
         public InvalidSpriteSizeException(
             Vector2i size
         ) {
@@ -146,6 +151,11 @@ public class Spritesheet {
     }
 
     private class InvalidSpriteIndexException extends RuntimeException {
+        /**
+         *
+         */
+        private static final long serialVersionUID = 3631380075106135529L;
+
         public InvalidSpriteIndexException(int index, int max) {
             super(
                 "Index " + index +

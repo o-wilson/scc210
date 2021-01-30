@@ -32,6 +32,11 @@ public class ParallaxBackground implements Drawable, Updatable {
      * opposite direction which isn't handled by the rendering
      */
     public class InvalidIndexException extends RuntimeException {
+        /**
+         *
+         */
+        private static final long serialVersionUID = -6567041962550312019L;
+
         public InvalidIndexException(int index) {
             super("Invalid Z-Index: " + index);
         }

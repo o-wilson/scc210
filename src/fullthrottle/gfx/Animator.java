@@ -15,7 +15,12 @@ public class Animator extends Sprite {
     private Animation currentAnimation;
 
     public class NoSuchAnimationException extends RuntimeException {
-        public NoSuchAnimationException() {
+        /**
+		 *
+		 */
+		private static final long serialVersionUID = 2263582322284391849L;
+
+		public NoSuchAnimationException() {
             super("This animator has no animations yet");
         }
         
