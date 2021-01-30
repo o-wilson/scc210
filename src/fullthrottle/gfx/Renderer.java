@@ -13,7 +13,6 @@ import org.jsfml.graphics.Drawable;
 import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
-import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
 
 /**
@@ -169,5 +168,10 @@ public final class Renderer {
         }
 
         objects.get(rL).add(o);
+    }
+
+    public static void clear() {
+        objects.clear();
+        renderLayers.clear();
     }
 }

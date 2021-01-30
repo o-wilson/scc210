@@ -1,9 +1,6 @@
 package fullthrottle.ui;
 
-import fullthrottle.debug.DebugRect;
 import fullthrottle.FullThrottle;
-import fullthrottle.gfx.FTTexture;
-import fullthrottle.ui.UI;
 
 import java.lang.Class;
 import java.lang.reflect.InvocationTargetException;
@@ -14,18 +11,11 @@ import java.util.List;
 import java.util.Observer;
 import java.util.Observable;
 
-import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.Drawable;
-import org.jsfml.graphics.FloatRect;
-import org.jsfml.graphics.Font;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.Sprite;
-import org.jsfml.graphics.Text;
-import org.jsfml.graphics.Texture;
-
-import org.jsfml.graphics.RectangleShape;
 
 import org.jsfml.system.Vector2i;
 import org.jsfml.system.Vector2f;
@@ -51,6 +41,10 @@ public class Button implements Observer, Drawable {
 
     private Sprite activeSprite;
     private UI.SpriteFillMode fillMode;
+
+    private Color defaultColor;
+    private Color hoverColor;
+    private Color heldColor;
 
     /**
      * Class containing all relevant data to invoke an action
@@ -155,6 +149,10 @@ public class Button implements Observer, Drawable {
         hovered = false;
         lastHovered = false;
 
+        defaultColor = Color.WHITE;
+        hoverColor = Color.WHITE;
+        heldColor = Color.WHITE;
+
         enabled = true;
 
         actions = new ArrayList<ButtonAction>();
@@ -222,6 +220,18 @@ public class Button implements Observer, Drawable {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public void setDefaultColor(Color defaultColor) {
+        this.defaultColor = defaultColor;
+    }
+
+    public void setHoverColor(Color hoverColor) {
+        this.hoverColor = hoverColor;
+    }
+
+    public void setHeldColor(Color heldColor) {
+        this.heldColor = heldColor;
     }
 
     /**
@@ -357,11 +367,11 @@ public class Button implements Observer, Drawable {
         this.activeSprite.setPosition(this.position);
         
         if ((heldLeft || heldRight) && enabled) {
-            this.activeSprite.setColor(new Color(100, 100, 100));
+            this.activeSprite.setColor(heldColor);
         } else if (hovered && enabled) {
-            this.activeSprite.setColor(new Color(200, 200, 200));
+            this.activeSprite.setColor(hoverColor);
         } else {
-            this.activeSprite.setColor(Color.WHITE);
+            this.activeSprite.setColor(defaultColor);
         }
 
         this.activeSprite.draw(target, states);

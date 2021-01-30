@@ -45,3 +45,8 @@ Windows: `dir /s /B *.java > sources.txt`
 ## General
 
 JavaDoc and the `out` folder (class files) are ignored by git as they don't need to be tracked, as is the `sources.txt` file, which can easily be generated and doesn't need to be tracked
+
+### Preferred Filetypes
+
+`.ogg` for audio - able to load longer audio files due to more compression
+`.png` for sprites - allows for transparency

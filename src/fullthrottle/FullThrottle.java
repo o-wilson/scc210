@@ -1,21 +1,42 @@
 package fullthrottle;
 
-import fullthrottle.gfx.*;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+
+//Exprimental don't touch
+import org.jsfml.audio.Music;
+import org.jsfml.graphics.BlendMode;
+import org.jsfml.graphics.Color;
+import org.jsfml.graphics.Image;
+import org.jsfml.graphics.RenderStates;
+import org.jsfml.graphics.RenderWindow;
+import org.jsfml.graphics.Sprite;
+import org.jsfml.graphics.Text;
+import org.jsfml.graphics.Texture;
+import org.jsfml.system.Vector2f;
+import org.jsfml.system.Vector2i;
+import org.jsfml.window.Keyboard.Key;
+import org.jsfml.window.VideoMode;
+import org.jsfml.window.WindowStyle;
+import org.jsfml.window.event.Event;
+
+import fullthrottle.gfx.Animation;
+import fullthrottle.gfx.FTTexture;
+import fullthrottle.gfx.ParallaxBackground;
 import fullthrottle.gfx.ParallaxBackground.Direction;
+import fullthrottle.gfx.Renderer;
+import fullthrottle.gfx.SpriteSequence;
+import fullthrottle.gfx.Spritesheet;
+import fullthrottle.sfx.FTMusic;
+import fullthrottle.ui.Button;
+import fullthrottle.ui.Button.ActionType;
+import fullthrottle.ui.ButtonManager;
+import fullthrottle.ui.UI;
+import fullthrottle.util.Input;
 import fullthrottle.util.TimeManager;
 import fullthrottle.util.Updatable;
-import fullthrottle.ui.*;
-import fullthrottle.ui.Button.ActionType;
 
-import org.jsfml.graphics.*;
-
-import org.jsfml.system.Vector2i;
-import org.jsfml.system.Vector2f;
-
-import org.jsfml.window.*;
-import org.jsfml.window.event.*;
-
-import java.util.ArrayList;
 
 public class FullThrottle {
     public static final int WINDOW_WIDTH = 1280;
@@ -24,11 +45,15 @@ public class FullThrottle {
     private static RenderWindow window;
 
     private ButtonManager buttonManager;
+    //Music stuff don't touch for now pls Java garbage collection is making a problems 
+    Music menu_music = new FTMusic("./res/Music/scorched_earth_original.ogg");
+    //
 
     // private ArrayList<Drawable> drawables;
     private ArrayList<Updatable> updatables;
 
     private Text fpsCount;
+    private boolean showFps = false;
 
     public FullThrottle() {
         start();
@@ -49,17 +74,9 @@ public class FullThrottle {
                 avgFps = 0.9 * avgFps + (1 - 0.9) * (1 / TimeManager.deltaTime());
 
             fpsCount.setString((int)avgFps + " FPS");
-            
-            update();
-
-            window.clear(Color.BLACK);
-
-            Renderer.render(window);
-            fpsCount.draw(window, new RenderStates(BlendMode.ALPHA));
-            
-            window.display();
 
             //Handle events
+            Input.clearFlags();
             for(Event event : window.pollEvents()) {
                 if(event.type == Event.Type.CLOSED) {
                     //The user pressed the close button
@@ -68,38 +85,70 @@ public class FullThrottle {
                 
                 if (event.asMouseEvent() != null) {
                     buttonManager.mouseEvent(event);
+
+                    if (event.asMouseButtonEvent() != null) {
+                        Input.mouseEvent(event);
+                    }
+                }
+
+                if (event.asKeyEvent() != null) {
+                    Input.keyEvent(event);
                 }
             }
+            if (Input.getKeyDown(Key.W)){
+                
+            }
+            
+            update();
+
+            window.clear(Color.BLACK);
+
+            Renderer.render(window);
+
+            if (Input.getKeyDown(Key.F3))
+                showFps = !showFps;
+            if (showFps)
+                fpsCount.draw(window, new RenderStates(BlendMode.ALPHA));
+            
+            window.display();
         }
     }
 
     private void start() {
+        //Initialisation
         window = new RenderWindow(
             new VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT),
             "Full Throttle",
             WindowStyle.TITLEBAR | WindowStyle.CLOSE
         );
+        window.setKeyRepeatEnabled(false);
+
+        Image icon = new Image();
+        try {
+            icon.loadFromFile(Paths.get("./res/Icon.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        window.setIcon(icon);
 
         buttonManager = ButtonManager.getInstance();
 
-        // drawables = new ArrayList<>();
         updatables = new ArrayList<>();
 
+
+
+        //Title
         Texture titleT = new FTTexture("./res/Title.png");
-        Texture settingsT = new FTTexture("./res/Settings.png");
-        Texture buttonT = new FTTexture("./res/Button.png");
-
-        Texture squareButton = new FTTexture("./res/SquareButton.png");
-        Texture squareButtonDisabled = new FTTexture("./res/SquareButtonDisabled.png");
-        
-        Sprite tButton = new Sprite(squareButton);
-        Sprite tButtonDisabled = new Sprite(squareButtonDisabled);
-
         Sprite titleS = new Sprite(titleT);
         Renderer.addDrawable(titleS);
         float titleW = titleS.getGlobalBounds().width;
         titleS.setPosition((WINDOW_WIDTH - titleW) / 2, 50);
 
+
+
+        //Buttons
+
+        Texture settingsT = new FTTexture("./res/Settings.png");
         Sprite settingsS = new Sprite(settingsT);
         Button settingsButton = new Button(
             new Vector2f(10, 10), new Vector2i(64, 64),
@@ -109,30 +158,20 @@ public class FullThrottle {
         Renderer.addDrawable(settingsButton);
         buttonManager.addObserver(settingsButton);
 
-        Button playButton = new Button(
-            Vector2f.ZERO, new Vector2i(196, 96)
+        Button playButton = new PlayButton(
+            Vector2f.ZERO, new Vector2i(192, 96)
         );
-        float playButtonX = (WINDOW_WIDTH - playButton.getWidth()) /2;
-        playButton.setPosition(playButtonX, 400);
-        playButton.addAction(this, "play", ActionType.LEFT_CLICK);
-        Renderer.addDrawable(playButton);
         buttonManager.addObserver(playButton);
 
-        Button testButton = new Button(
-            new Vector2f(400, 400), new Vector2i(128, 128),
-            tButton, UI.SpriteFillMode.STRETCH
+        Button highScoresButton = new HighScoresButton(
+            Vector2f.ZERO, new Vector2i(192, 96)
         );
-        testButton.setDisabledSprite(tButtonDisabled);
-        testButton.addAction(this, "testEnabled", ActionType.LEFT_CLICK);
-        testButton.addAction(this, "testDisabled", ActionType.LEFT_CLICK, false);
-        buttonManager.addObserver(testButton);
-        Renderer.addDrawable(testButton);
+        buttonManager.addObserver(highScoresButton);
 
-        playButton.addAction(testButton, "toggleEnabled", ActionType.RIGHT_CLICK);
 
 
         // BACKGROUND TEST
-        ParallaxBackground bg = new ParallaxBackground(window, Direction.LEFT, 700);
+        ParallaxBackground bg = new ParallaxBackground(window, Direction.LEFT, 3000);
 
         Texture sky = new FTTexture("./res/BackgroundTest/Sky.png");
         Texture buildings = new FTTexture("./res/BackgroundTest/Buildings.png");
@@ -152,9 +191,44 @@ public class FullThrottle {
         bg.addElement(buildingsS, 15, Vector2f.ZERO);
         bg.addElement(roadS, 5, Vector2f.ZERO);
         bg.addElement(bushS, 5, new Vector2f(1000, 506.25f), 500);
-
+        
         updatables.add(bg);
         Renderer.addDrawable(bg, 1000);
+
+
+
+        //Added stuff for the audio
+        menu_music.play();
+        //END of added stuff for the audio
+
+
+
+        //Sequence/Animation Test
+        Spritesheet carSheet = new Spritesheet(
+            new  FTTexture("./res/AnimationTest.png"),
+            new Vector2i(32, 32)
+        );
+        SpriteSequence carSeq = new SpriteSequence(carSheet);
+        Animation carAnim = new Animation(carSeq, 8, true);
+        Renderer.addDrawable(carAnim);
+        carAnim.setScale(new Vector2f(5, 5));
+        carAnim.setPosition(new Vector2f(900, 450));
+
+
+
+        // Spritesheet demo
+
+        // Renderer.clear();
+
+        // Texture roadSheet = new FTTexture("./res/Road.png");
+        // Spritesheet sheet = new Spritesheet(roadSheet, new Vector2i(16, 16));
+
+        // for (int i = 0; i < 27; i++) {
+        //     Sprite s = sheet.getSprite(i);
+        //     s.scale(3, 3);
+        //     s.setPosition(32 + 54 * (i % 9), 32 + 54 * (i / 9));
+        //     Renderer.addDrawable(s);
+        // }
     }
 
     private void update() {
@@ -172,18 +246,6 @@ public class FullThrottle {
 
     public void settings() {
         System.out.println("Settings clicked");
-    }
-
-    public void play() {
-        System.out.println("Play game");
-    }
-
-    public void testEnabled() {
-        System.out.println("Button is enabled");
-    }
-
-    public void testDisabled() {
-        System.out.println("Button is disabled");
     }
 
     public static void main(String[] args) {

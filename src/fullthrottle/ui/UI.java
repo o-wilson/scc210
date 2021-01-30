@@ -5,7 +5,6 @@ import fullthrottle.gfx.FTFont;
 
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
@@ -18,7 +17,6 @@ import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.TextureCreationException;
 
 import org.jsfml.system.Vector2i;
-import org.jsfml.system.Vector2f;
 
 public final class UI {
     
