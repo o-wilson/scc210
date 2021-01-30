@@ -238,16 +238,6 @@ public class FullThrottle {
 
         Renderer.clear();
         
-        // for (int i = 0; i < 5; i++) {
-        //     UpgradeMarker uM = new UpgradeMarker(new Vector2f(64, 64), new Vector2f(400 + (i*76), 400));
-        //     Renderer.addDrawable(uM);
-        //     if (i==1)
-        //         uM.unlock();
-
-        //     if (i==0)
-        //         uM.buy();
-        // }
-        
         int[] endPoints = new int[] {7, 14, 25, 35, 44};
         String[] names = new String[] {"Fuel", "Armour", "Speed", "Increase Health", "Restore Health"};
         Texture source = new FTTexture("./res/shop/Upgrades.png");

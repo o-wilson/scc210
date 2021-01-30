@@ -11,7 +11,14 @@ import fullthrottle.ui.Button;
 import fullthrottle.ui.ButtonManager;
 import fullthrottle.ui.UI.SpriteFillMode;
 
-public class UpgradeButton extends Button {
+/**
+ * Implementation of Button specifically for the up/downgrade buttons
+ * used with an UpgradePath
+ */
+public final class UpgradeButton extends Button {
+    /**
+     * The type of button (up- or downgrade)
+     */
     public enum ButtonType {
         UP(0, "buyNext"),
         DOWN(1, "sellLast")
@@ -26,6 +33,13 @@ public class UpgradeButton extends Button {
         }
     }
 
+    /**
+     * Initialises a button related to the given UpgradePath
+     * and sets the action
+     * @param path the associated UpgradePath to control
+     * @param type whether it's up- or downgrade
+     * @param size size of the button
+     */
     public UpgradeButton(
         UpgradePath path, ButtonType type,
         Vector2f size
