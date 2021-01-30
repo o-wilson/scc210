@@ -32,10 +32,6 @@ public final class UI {
         "./res/shop/UpgradeMarkers.png"
     );
 
-    public static Texture UPGRADE_BUTTONS_TEXTURE = new FTTexture(
-        "./res/shop/UpgradeButtons.png"
-    );
-
     /**
      * Modes for displaying the button's sprite
      */
