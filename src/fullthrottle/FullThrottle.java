@@ -46,7 +46,7 @@ public class FullThrottle {
 
     private ButtonManager buttonManager;
     //Music stuff don't touch for now pls Java garbage collection is making a problems 
-    Music menu_music = new FTMusic("./res/Music/scorched_earth_original.ogg");
+    FTMusic menu_music = new FTMusic();
     //
 
     // private ArrayList<Drawable> drawables;
@@ -198,7 +198,7 @@ public class FullThrottle {
 
 
         //Added stuff for the audio
-        menu_music.play();
+        menu_music.play_music("./res/Music/scorched_earth_original.ogg");
         //END of added stuff for the audio
 
 
@@ -246,6 +246,7 @@ public class FullThrottle {
 
     public void settings() {
         System.out.println("Settings clicked");
+        menu_music.play_music("./res/Music/scorched_earth_original.ogg");
     }
 
     public static void main(String[] args) {
