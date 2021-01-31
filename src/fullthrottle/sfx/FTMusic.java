@@ -22,5 +22,6 @@ public class FTMusic extends Music {
       play();
     }
 
+    
 }
 

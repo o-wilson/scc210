@@ -29,6 +29,7 @@ import fullthrottle.gfx.Renderer;
 import fullthrottle.gfx.SpriteSequence;
 import fullthrottle.gfx.Spritesheet;
 import fullthrottle.sfx.FTMusic;
+import fullthrottle.sfx.FTSound;
 import fullthrottle.ui.Button;
 import fullthrottle.ui.Button.ActionType;
 import fullthrottle.ui.ButtonManager;
@@ -47,6 +48,7 @@ public class FullThrottle {
     private ButtonManager buttonManager;
     //Music stuff don't touch for now pls Java garbage collection is making a problems 
     FTMusic menu_music = new FTMusic();
+    FTSound soundeff = new FTSound();
     //
 
     // private ArrayList<Drawable> drawables;
@@ -162,6 +164,7 @@ public class FullThrottle {
             Vector2f.ZERO, new Vector2i(192, 96)
         );
         buttonManager.addObserver(playButton);
+        playButton.addAction(this, "play_button_test_sounds", ActionType.LEFT_CLICK);
 
         Button highScoresButton = new HighScoresButton(
             Vector2f.ZERO, new Vector2i(192, 96)
@@ -246,7 +249,11 @@ public class FullThrottle {
 
     public void settings() {
         System.out.println("Settings clicked");
-        menu_music.play_music("./res/Music/scorched_earth_original.ogg");
+    }
+
+    
+    public void play_button_test_sounds() {
+        soundeff.play_sound("./res/SoundEffects/Play_sound.ogg");
     }
 
     public static void main(String[] args) {
