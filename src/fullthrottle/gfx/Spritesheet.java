@@ -125,6 +125,10 @@ public class Spritesheet {
         return sheetDimensions.x * sheetDimensions.y;
     }
 
+    public Vector2i getSheetDimensions() {
+        return sheetDimensions;
+    }
+
     private class InvalidSpriteSizeException extends RuntimeException {
         /**
          *
