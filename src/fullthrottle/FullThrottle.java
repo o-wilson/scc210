@@ -199,9 +199,9 @@ public class FullThrottle {
         Renderer.addDrawable(bg, 1000);
 
 
-
+        //Removed because it's causing the game to hang
         //Added stuff for the audio
-        menu_music.play_music("./res/Music/scorched_earth_original.ogg");
+        // menu_music.play_music("./res/Music/scorched_earth_original.ogg");
         //END of added stuff for the audio
 
 
