@@ -244,7 +244,7 @@ public class FullThrottle {
 
         Renderer.clear();
 
-        actualRoad = new Road(4, 256);
+        actualRoad = new Road(4, 320);
         Renderer.addDrawable(actualRoad);
         updatables.add(actualRoad);
         actualRoad.setSpeed(50);
@@ -255,11 +255,11 @@ public class FullThrottle {
             u.update();
         }
 
-        if (Input.getKeyDown(Key.NUM1))
-            actualRoad.setRoadSection(RoadSection.BLANK);
-        else if (Input.getKeyDown(Key.NUM2))
+        // if (Input.getKeyDown(Key.NUM1))
+        //     actualRoad.setRoadSection(RoadSection.BLANK);
+        if (Input.getKeyDown(Key.NUM2))
             actualRoad.setRoadSection(RoadSection.WHITE);
-        else if (Input.getKeyDown(Key.NUM3))
+        if (Input.getKeyDown(Key.NUM3))
             actualRoad.setRoadSection(RoadSection.YELLOW);
 
         if (Input.getKeyDown(Key.UP))

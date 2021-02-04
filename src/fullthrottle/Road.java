@@ -70,21 +70,24 @@ public final class Road implements Drawable, Updatable {
      * road tile spritesheet
      */
     public enum RoadSection {
-        BLANK(0, 0, 0, 0),
-        WHITE(1, 2, 40, 4),
-        YELLOW(5, 6, 10, 8)
+        WHITE(0, 1, 2, 40, 4, 5),
+        YELLOW(6, 7, 8, 10, 10, 11)
         ;
 
+        public final int transitionColumn;
         public final int startColumn;
         public final int mainColumn;
         public final int variation;
         public final int endColumn;
+        public final int baseColumn;
 
-        private RoadSection(int s, int m, int v, int e) {
+        private RoadSection(int t, int s, int m, int v, int e, int b) {
+            transitionColumn = t;
             startColumn = s;
             mainColumn = m;
             variation = v;
             endColumn = e;
+            baseColumn = b;
         }
     }
 
@@ -132,9 +135,10 @@ public final class Road implements Drawable, Updatable {
 
         this.lanes = lanes;
         this.speed = 0;
+        this.lastRoadSection = rS;
         this.roadSection = rS;
 
-        ROAD_TILE_SCALE = (height / lanes) / ROAD_TILE_DIMENSIONS.y;
+        ROAD_TILE_SCALE = (height / (lanes + 2)) / ROAD_TILE_DIMENSIONS.y;
 
         this.origin = new Vector2f(
             0, FullThrottle.WINDOW_HEIGHT - height
@@ -165,22 +169,30 @@ public final class Road implements Drawable, Updatable {
      * @param transition used when transitioning:
      *      0 = no transition,
      *      1 = end current,
-     *      2 = blank,
+     *      2 = transition,
      *      3 = start next
      */
     private void generateColumn(int transition) {
-        TileTexCoords[] nextColumn = new TileTexCoords[lanes];
+        int size = lanes + 2;
+        if (transition == 2)
+            size *= 2;
+        TileTexCoords[] nextColumn = new TileTexCoords[size];
 
-        for (int i = 0; i < lanes; i++) {
+        for (int i = 0; i < (lanes + 2) * (transition == 2 ? 2 : 1); i++) {
             float tileX = roadSection.mainColumn, tileY;
 
             // Set y component of texture coordinate
-            if (i == 0) {
+            int j = i % (lanes + 2);
+            if (j == 0) {
                 tileY = 0;
-            } else if (i == lanes - 1) {
-                tileY = 2;
-            } else {
+            } else if (j == 1) {
                 tileY = 1;
+            } else if (j == lanes) {
+                tileY = 3;
+            } else if (j == lanes + 1) {
+                tileY = 4;
+            } else {
+                tileY = 2;
             }
 
             // Set x component of texture coordinate
@@ -200,7 +212,11 @@ public final class Road implements Drawable, Updatable {
             } else if (transition == 1) {
                 tileX = lastRoadSection.endColumn;
             } else if (transition == 2) {
-                tileX = RoadSection.BLANK.mainColumn;
+                if (i < lanes + 2) {
+                    tileX = lastRoadSection.baseColumn;
+                } else {
+                    tileX = roadSection.transitionColumn;
+                }
             } else if (transition == 3) {
                 tileX = roadSection.startColumn;
             }
@@ -225,6 +241,8 @@ public final class Road implements Drawable, Updatable {
         for (TileTexCoords[] c : columns) {
             //For each tile in the column
             for (int t = 0; t < c.length; t++) {
+                if (t == lanes + 2)
+                    drawPos = new Vector2f(drawPos.x, origin.y);
                 //For each point in the tile
                 for (int p = 0; p < 4; p++) {
                     //Create and add a vertex
@@ -245,12 +263,16 @@ public final class Road implements Drawable, Updatable {
                 );
             }
             //Update drawPos to top of next column
-            drawPos = Vector2f.add(
-                drawPos,
-                Vector2f.mul(new Vector2f(
-                    ROAD_TILE_DIMENSIONS.x,
-                    -ROAD_TILE_DIMENSIONS.y * c.length
-                ), ROAD_TILE_SCALE)
+            // drawPos = Vector2f.add(
+            //     drawPos,
+            //     Vector2f.mul(new Vector2f(
+            //         ROAD_TILE_DIMENSIONS.x,
+            //         -ROAD_TILE_DIMENSIONS.y * c.length
+            //     ), ROAD_TILE_SCALE)
+            // );
+            drawPos = new Vector2f(
+                drawPos.x + ROAD_TILE_SCALE * ROAD_TILE_DIMENSIONS.x,
+                origin.y
             );
         }
 
