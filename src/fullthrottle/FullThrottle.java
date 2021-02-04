@@ -248,9 +248,6 @@ public class FullThrottle {
         Renderer.addDrawable(actualRoad);
         updatables.add(actualRoad);
         actualRoad.setSpeed(50);
-
-        DebugRect dRect = new DebugRect(400, 0, 600, FullThrottle.WINDOW_HEIGHT);
-        Renderer.addDrawable(dRect, -10);
     }
 
     private void update() {

@@ -15,18 +15,37 @@ import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 
 import fullthrottle.gfx.FTTexture;
-import fullthrottle.gfx.Spritesheet;
 import fullthrottle.util.TimeManager;
 import fullthrottle.util.Updatable;
 
+/**
+ * A class that creates a dynamically generating road that scrolls
+ * at a variable speed, road type can be changed while running so 
+ * only one should be needed
+ */
 public final class Road implements Drawable, Updatable {
+    /**
+     * Dimensions of each tile in the spritesheet
+     */
     public static Vector2i ROAD_TILE_DIMENSIONS = new Vector2i(16, 16);
+    /**
+     * The multiplier used to ensure the road is the specified height
+     */
     public static float ROAD_TILE_SCALE = 1;
+    /**
+     * The texture containing the road tiles spritesheet
+     */
     public static Texture ROAD_TEXTURE = new FTTexture("./res/Road.png");
-    public static Spritesheet ROAD_SHEET = new Spritesheet(ROAD_TEXTURE, ROAD_TILE_DIMENSIONS);
 
+    /**
+     * Used if no RoadSection is specified on creation
+     */
     public static RoadSection DEFAULT_ROAD_SECTION = RoadSection.WHITE;
 
+    /**
+     * Used to calculate texture coordinates based on
+     * the top left coordinate; vertex order: TL TR BR BL
+     */
     private static Vector2f[] VERTEX_OFFSETS = new Vector2f[] {
         Vector2f.ZERO,
         new Vector2f(ROAD_TILE_DIMENSIONS.x, 0),
@@ -39,12 +58,17 @@ public final class Road implements Drawable, Updatable {
 
     private float speed;
 
+    private RoadSection lastRoadSection;
     private RoadSection roadSection;
 
     private Random rand;
 
     private Vector2f origin;
 
+    /**
+     * Holds information about the structure and sections of the
+     * road tile spritesheet
+     */
     public enum RoadSection {
         BLANK(0, 0, 0, 0),
         WHITE(1, 2, 40, 4),
@@ -64,6 +88,10 @@ public final class Road implements Drawable, Updatable {
         }
     }
 
+    /**
+     * Stores 4 texture coordinates corresponding to each
+     * corner of a tile
+     */
     private class TileTexCoords {
         private Vector2f[] points = new Vector2f[4];
 
@@ -78,12 +106,27 @@ public final class Road implements Drawable, Updatable {
         }
     }
 
+    /**
+     * Creates a road using the default RoadSection
+     * @param lanes number of lanes to create the road with
+     * @param height height in pixels of the road
+     */
     public Road(int lanes, float height) {
         this(lanes, height, DEFAULT_ROAD_SECTION);
     }
 
+    /**
+     * Creates a road using a specified RoadSection
+     * @param lanes number of lanes to create the road with
+     * @param height height in pixels of the road
+     * @param rS RoadSection to use when generating the first screen
+     */
     public Road(int lanes, float height, RoadSection rS) {
         if (lanes < 2) throw new InvalidLaneCountException(lanes);
+
+        if (height <= 0) throw new IllegalArgumentException(
+            "Invalid height " + height + "; must be >0"
+        );
 
         rand = new Random();
 
@@ -98,23 +141,40 @@ public final class Road implements Drawable, Updatable {
         );
 
         columns = new ArrayList<>();
-
-        // for (int i = 0; i < 20; i++)
-            // generateColumn();
-        // System.out.println(roadSection);
-        // System.out.println(columns.get(0)[0].getVertex(0));
-    }
-
-    //Just for demo
-    public void addColumn() {
-        // generateColumn();
     }
     
+    /**
+     * Generates the transition between road types
+     * Called from setRoadSection
+     */
+    private void generateTransitionColumns() {
+        for (int i = 1; i < 4; i++) {
+            generateColumn(i);
+        }
+    }
+
+    /**
+     * Generate a new column (not transitional)
+     */
     private void generateColumn() {
+        generateColumn(0);
+    }
+
+    /**
+     * Generates a new column of road tiles
+     * @param transition used when transitioning:
+     *      0 = no transition,
+     *      1 = end current,
+     *      2 = blank,
+     *      3 = start next
+     */
+    private void generateColumn(int transition) {
         TileTexCoords[] nextColumn = new TileTexCoords[lanes];
 
         for (int i = 0; i < lanes; i++) {
-            float tileX, tileY;
+            float tileX = roadSection.mainColumn, tileY;
+
+            // Set y component of texture coordinate
             if (i == 0) {
                 tileY = 0;
             } else if (i == lanes - 1) {
@@ -123,17 +183,26 @@ public final class Road implements Drawable, Updatable {
                 tileY = 1;
             }
 
-            //random 1-100
-            int variation = rand.nextInt(100) + 1;
-            if (variation > roadSection.variation) {
-                tileX = roadSection.mainColumn;
-            } else {
-                if (roadSection.endColumn - (roadSection.mainColumn + 1) == 1) {
-                    tileX = roadSection.mainColumn + 1;
+            // Set x component of texture coordinate
+            if (transition == 0) {
+                //random 1-100
+                int variation = rand.nextInt(100) + 1;
+                if (variation > roadSection.variation) {
+                    tileX = roadSection.mainColumn;
                 } else {
-                    //needs actually doing
-                    tileX = 0;
+                    if (roadSection.endColumn - (roadSection.mainColumn + 1) == 1) {
+                        tileX = roadSection.mainColumn + 1;
+                    } else {
+                        //needs actually doing
+                        tileX = 0;
+                    }
                 }
+            } else if (transition == 1) {
+                tileX = lastRoadSection.endColumn;
+            } else if (transition == 2) {
+                tileX = RoadSection.BLANK.mainColumn;
+            } else if (transition == 3) {
+                tileX = roadSection.startColumn;
             }
 
             Vector2f topLeft = Vector2f.componentwiseMul(
@@ -194,20 +263,27 @@ public final class Road implements Drawable, Updatable {
     @Override
     public void update() {
         FloatRect vBounds = FullThrottle.getViewRect();
-        // FloatRect vBounds = new FloatRect(400, 0, 600, FullThrottle.WINDOW_HEIGHT);
+        /* 
+         * For testing (simulates screen boundaries to
+         * see what's happening "offscreen"): 
+         */
+        // FloatRect vBounds = new FloatRect(
+        //     400, 0, 600, FullThrottle.WINDOW_HEIGHT
+        // );
 
         origin = Vector2f.sub(origin, new Vector2f(
             speed * TimeManager.deltaTime(), 0
         ));
 
-        while ((columns.size() - 1) * ROAD_TILE_DIMENSIONS.x * ROAD_TILE_SCALE < vBounds.width) {
+        float tileWidth = ROAD_TILE_DIMENSIONS.x * ROAD_TILE_SCALE;
+        while ((columns.size() - 1) * tileWidth < vBounds.width) {
             generateColumn();
         }
 
-        if (origin.x < vBounds.left-(ROAD_TILE_SCALE * ROAD_TILE_DIMENSIONS.x)) {
+        if (origin.x < vBounds.left - tileWidth) {
             origin = Vector2f.add(
                 origin, new Vector2f(
-                    ROAD_TILE_SCALE * ROAD_TILE_DIMENSIONS.x, 0
+                    tileWidth, 0
                 )
             );
             if (columns.size() != 0)
@@ -215,23 +291,51 @@ public final class Road implements Drawable, Updatable {
         }
     }
 
+    /**
+     * Get current speed of the road
+     * @return float value of speed
+     */
     public float getSpeed() {
         return speed;
     }
 
+    /**
+     * Set speed to specific value
+     * @param speed new speed for road
+     */
     public void setSpeed(float speed) {
+        if (speed < 0) throw new IllegalArgumentException(
+            "Illegal speed " + speed + "; must be >= 0"
+        );
         this.speed = speed;
     }
 
+    /**
+     * Change speed by specified amount
+     * @param dSpeed amount to change speed by
+     */
     public void increaseSpeed(float dSpeed) {
         this.speed += dSpeed;
+        if (speed < 0) speed = 0;
     }
 
+    /**
+     * Change the type of road that will be generated
+     * for the next column
+     * @param roadSection RoadSection to change to
+     */
     public void setRoadSection(RoadSection roadSection) {
+        this.lastRoadSection = this.roadSection;
         this.roadSection = roadSection;
+        generateTransitionColumns();
     }
 
     private class InvalidLaneCountException extends RuntimeException {
+        /**
+         *
+         */
+        private static final long serialVersionUID = 4358193149770933936L;
+
         public InvalidLaneCountException(int count) {
             super(
                 "Invalid number of lanes " + count +
