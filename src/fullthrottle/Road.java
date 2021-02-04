@@ -70,8 +70,8 @@ public final class Road implements Drawable, Updatable {
      * road tile spritesheet
      */
     public enum RoadSection {
-        WHITE(0, 1, 2, 40, 4, 5),
-        YELLOW(6, 7, 8, 10, 10, 11)
+        WHITE(0, 1, 2, 30, 5, 6),
+        YELLOW(7, 8, 9, 20, 12, 13)
         ;
 
         public final int transitionColumn;
@@ -199,15 +199,10 @@ public final class Road implements Drawable, Updatable {
             if (transition == 0) {
                 //random 1-100
                 int variation = rand.nextInt(100) + 1;
-                if (variation > roadSection.variation) {
-                    tileX = roadSection.mainColumn;
-                } else {
-                    if (roadSection.endColumn - (roadSection.mainColumn + 1) == 1) {
-                        tileX = roadSection.mainColumn + 1;
-                    } else {
-                        //needs actually doing
-                        tileX = 0;
-                    }
+                tileX = roadSection.mainColumn;
+                if (variation <= roadSection.variation) {
+                    int variants = roadSection.endColumn - (int)tileX;
+                    tileX += 1 + rand.nextInt(variants - 1);
                 }
             } else if (transition == 1) {
                 tileX = lastRoadSection.endColumn;
