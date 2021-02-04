@@ -232,6 +232,15 @@ public class FullThrottle {
         //     s.setPosition(32 + 54 * (i % 9), 32 + 54 * (i / 9));
         //     Renderer.addDrawable(s);
         // }
+
+
+
+        // Road generation demo
+
+        Renderer.clear();
+
+        Road actualRoad = new Road(7, 10);
+        Renderer.addDrawable(actualRoad);
     }
 
     private void update() {
