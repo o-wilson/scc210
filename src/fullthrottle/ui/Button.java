@@ -129,9 +129,8 @@ public class Button implements Observer, Drawable {
      * Button with text, background sprite and a specified SpriteFillMode
      * @param pos Button's position
      * @param size Button's size
-     * @param text Button's text
      * @param sprite Button's sprite
-     * @param fillMode Fill mode for sprite, see {@link UI#SpriteFillMode}
+     * @param fillMode Fill mode for sprite
      */
     public Button(Vector2f pos, Vector2i size, Sprite sprite, UI.SpriteFillMode fillMode) {
         this.position = pos;

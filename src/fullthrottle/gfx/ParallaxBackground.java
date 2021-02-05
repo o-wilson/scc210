@@ -27,7 +27,7 @@ import java.util.HashMap;
 public class ParallaxBackground implements Drawable, Updatable {
     
     /**
-     * Thrown if the user attempts to add an element to a layer <= 0
+     * Thrown if the user attempts to add an element to a layer &lt;= 0
      * 0 would cause a div by 0, -ve would move elements in the
      * opposite direction which isn't handled by the rendering
      */
@@ -188,9 +188,9 @@ public class ParallaxBackground implements Drawable, Updatable {
      * loop frequency
      * @param s sprite to be drawn
      * @param zIndex layer to be drawn on (higher = further back)
-     * CANNOT BE <= 0, will throw InvalidIndexException
+     * CANNOT BE &lt;= 0, will throw InvalidIndexException
      * @param startPos position for sprite to start at
-     * @throws InvalidIndexException if index <= 0 given
+     * @throws InvalidIndexException if index &lt;= 0 given
      */
     public void addElement(
         Sprite s, int zIndex, Vector2f startPos
@@ -205,11 +205,11 @@ public class ParallaxBackground implements Drawable, Updatable {
      * add an element to the background with a specified frequency
      * @param s sprite to be drawn
      * @param zIndex layer to be drawn on (higher = further back)
-     * CANNOT BE <= 0, will throw InvalidIndexException
+     * CANNOT BE &lt;= 0, will throw InvalidIndexException
      * @param startPos position for sprite to start at
      * @param loopFrequency distance (including sprite width) between
      * looping elements
-     * @throws InvalidIndexException if index <= 0 given
+     * @throws InvalidIndexException if index &lt;= 0 given
      */
     public void addElement(
         Sprite s, int zIndex, Vector2f startPos,
