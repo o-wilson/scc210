@@ -255,12 +255,12 @@ public class FullThrottle {
             u.update();
         }
 
-        // if (Input.getKeyDown(Key.NUM1))
-        //     actualRoad.setRoadSection(RoadSection.BLANK);
-        if (Input.getKeyDown(Key.NUM2))
+        if (Input.getKeyDown(Key.NUM1))
             actualRoad.setRoadSection(RoadSection.WHITE);
-        if (Input.getKeyDown(Key.NUM3))
+        if (Input.getKeyDown(Key.NUM2))
             actualRoad.setRoadSection(RoadSection.YELLOW);
+        if (Input.getKeyDown(Key.NUM3))
+            actualRoad.setRoadSection(RoadSection.DIRT);
 
         if (Input.getKeyDown(Key.UP))
             actualRoad.increaseSpeed(5);

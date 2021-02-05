@@ -71,7 +71,8 @@ public final class Road implements Drawable, Updatable {
      */
     public enum RoadSection {
         WHITE(0, 1, 2, 30, 5, 6),
-        YELLOW(7, 8, 9, 20, 12, 13)
+        YELLOW(7, 8, 9, 20, 12, 13),
+        DIRT(14, 15, 16, 40, 23, 24)
         ;
 
         public final int transitionColumn;
