@@ -62,6 +62,9 @@ public class FullThrottle {
     //Road demo
     public Road actualRoad;
 
+    //Movement test
+    public Player pPlayer;
+
     public FullThrottle() {
         start();
 
@@ -102,9 +105,7 @@ public class FullThrottle {
                     Input.keyEvent(event);
                 }
             }
-            if (Input.getKeyDown(Key.W)){
-                
-            }
+            
             
             update();
 
@@ -248,6 +249,10 @@ public class FullThrottle {
         Renderer.addDrawable(actualRoad);
         updatables.add(actualRoad);
         actualRoad.setSpeed(50);
+
+        // Renderer.clear();
+        pPlayer = new Player();
+        Renderer.addDrawable(pPlayer, 0);
     }
 
     private void update() {
@@ -267,6 +272,17 @@ public class FullThrottle {
         else if (Input.getKeyDown(Key.DOWN))
             actualRoad.increaseSpeed(-5);
 
+        Vector2f moveDirection = Vector2f.ZERO;
+        if (Input.getKey(Key.W))
+            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, -1));
+        else if (Input.getKey(Key.S))
+            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, 1));
+
+        if (Input.getKey(Key.A))
+            moveDirection = Vector2f.add(moveDirection, new Vector2f(-1, 0));
+        else if (Input.getKey(Key.D))
+            moveDirection = Vector2f.add(moveDirection, new Vector2f(1, 0));
+        pPlayer.move(moveDirection);
     }
 
     public static RenderWindow getWindow() {
