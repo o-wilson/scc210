@@ -248,7 +248,9 @@ public class FullThrottle {
         actualRoad = new Road(4, 320);
         Renderer.addDrawable(actualRoad);
         updatables.add(actualRoad);
-        actualRoad.setSpeed(50);
+        actualRoad.setSpeed(90);
+
+        // Player movement demo
 
         // Renderer.clear();
         pPlayer = new Player();
