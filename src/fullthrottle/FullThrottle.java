@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-//Exprimental don't touch
-import org.jsfml.audio.Music;
 import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.Image;
@@ -46,12 +44,7 @@ public class FullThrottle {
     private static RenderWindow window;
 
     private ButtonManager buttonManager;
-    //Music stuff don't touch for now pls Java garbage collection is making a problems 
-    FTMusic menu_music = new FTMusic();
-    FTSound soundeff = new FTSound();
-    //
 
-    // private ArrayList<Drawable> drawables;
     private ArrayList<Updatable> updatables;
 
     private Text fpsCount;
@@ -97,9 +90,6 @@ public class FullThrottle {
                     Input.keyEvent(event);
                 }
             }
-            if (Input.getKeyDown(Key.W)){
-                
-            }
             
             update();
 
@@ -140,36 +130,35 @@ public class FullThrottle {
 
 
         //Title
-        Texture titleT = new FTTexture("./res/Title.png");
-        Sprite titleS = new Sprite(titleT);
-        Renderer.addDrawable(titleS);
-        float titleW = titleS.getGlobalBounds().width;
-        titleS.setPosition((WINDOW_WIDTH - titleW) / 2, 50);
+        // Texture titleT = new FTTexture("./res/Title.png");
+        // Sprite titleS = new Sprite(titleT);
+        // Renderer.addDrawable(titleS);
+        // float titleW = titleS.getGlobalBounds().width;
+        // titleS.setPosition((WINDOW_WIDTH - titleW) / 2, 50);
 
 
 
         //Buttons
+        // Texture settingsT = new FTTexture("./res/Settings.png");
+        // Sprite settingsS = new Sprite(settingsT);
+        // Button settingsButton = new Button(
+        //     new Vector2f(10, 10), new Vector2i(64, 64),
+        //     settingsS, UI.SpriteFillMode.STRETCH
+        // );
+        // settingsButton.addAction(this, "settings", ActionType.LEFT_CLICK);
+        // Renderer.addDrawable(settingsButton);
+        // buttonManager.addObserver(settingsButton);
 
-        Texture settingsT = new FTTexture("./res/Settings.png");
-        Sprite settingsS = new Sprite(settingsT);
-        Button settingsButton = new Button(
-            new Vector2f(10, 10), new Vector2i(64, 64),
-            settingsS, UI.SpriteFillMode.STRETCH
-        );
-        settingsButton.addAction(this, "settings", ActionType.LEFT_CLICK);
-        Renderer.addDrawable(settingsButton);
-        buttonManager.addObserver(settingsButton);
+        // Button playButton = new PlayButton(
+        //     Vector2f.ZERO, new Vector2i(192, 96)
+        // );
+        // buttonManager.addObserver(playButton);
+        // playButton.addAction(this, "play_button_test_sounds", ActionType.LEFT_CLICK);
 
-        Button playButton = new PlayButton(
-            Vector2f.ZERO, new Vector2i(192, 96)
-        );
-        buttonManager.addObserver(playButton);
-        playButton.addAction(this, "play_button_test_sounds", ActionType.LEFT_CLICK);
-
-        Button highScoresButton = new HighScoresButton(
-            Vector2f.ZERO, new Vector2i(192, 96)
-        );
-        buttonManager.addObserver(highScoresButton);
+        // Button highScoresButton = new HighScoresButton(
+        //     Vector2f.ZERO, new Vector2i(192, 96)
+        // );
+        // buttonManager.addObserver(highScoresButton);
 
 
 
@@ -192,46 +181,11 @@ public class FullThrottle {
 
         bg.addElement(skyS, 30, Vector2f.ZERO);
         bg.addElement(buildingsS, 15, Vector2f.ZERO);
-        bg.addElement(roadS, 5, Vector2f.ZERO);
-        bg.addElement(bushS, 5, new Vector2f(1000, 506.25f), 500);
+        // bg.addElement(roadS, 5, Vector2f.ZERO);
+        // bg.addElement(bushS, 5, new Vector2f(1000, 506.25f), 500);
         
         updatables.add(bg);
         Renderer.addDrawable(bg, 1000);
-
-
-
-        //Added stuff for the audio
-        menu_music.play_music("./res/Music/scorched_earth_original.ogg");
-        //END of added stuff for the audio
-
-
-
-        //Sequence/Animation Test
-        Spritesheet carSheet = new Spritesheet(
-            new  FTTexture("./res/AnimationTest.png"),
-            new Vector2i(32, 32)
-        );
-        SpriteSequence carSeq = new SpriteSequence(carSheet);
-        Animation carAnim = new Animation(carSeq, 8, true);
-        Renderer.addDrawable(carAnim);
-        carAnim.setScale(new Vector2f(5, 5));
-        carAnim.setPosition(new Vector2f(900, 450));
-
-
-
-        // Spritesheet demo
-
-        // Renderer.clear();
-
-        // Texture roadSheet = new FTTexture("./res/Road.png");
-        // Spritesheet sheet = new Spritesheet(roadSheet, new Vector2i(16, 16));
-
-        // for (int i = 0; i < 27; i++) {
-        //     Sprite s = sheet.getSprite(i);
-        //     s.scale(3, 3);
-        //     s.setPosition(32 + 54 * (i % 9), 32 + 54 * (i / 9));
-        //     Renderer.addDrawable(s);
-        // }
     }
 
     private void update() {
@@ -247,14 +201,9 @@ public class FullThrottle {
         return null;
     }
 
-    public void settings() {
-        System.out.println("Settings clicked");
-    }
-
-    
-    public void play_button_test_sounds() {
-        soundeff.play_sound("./res/SoundEffects/Play_sound.ogg");
-    }
+    // public void settings() {
+    //     System.out.println("Settings clicked");
+    // }
 
     public static void main(String[] args) {
         new FullThrottle();
