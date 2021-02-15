@@ -33,6 +33,7 @@ import fullthrottle.sfx.FTSound;
 import fullthrottle.ui.Button;
 import fullthrottle.ui.Button.ActionType;
 import fullthrottle.ui.ButtonManager;
+import fullthrottle.ui.ProgressBar;
 import fullthrottle.ui.UI;
 import fullthrottle.util.Input;
 import fullthrottle.util.TimeManager;
@@ -47,8 +48,8 @@ public class FullThrottle {
 
     private ButtonManager buttonManager;
     //Music stuff don't touch for now pls Java garbage collection is making a problems 
-    FTMusic menu_music = new FTMusic();
-    FTSound soundeff = new FTSound();
+    // FTMusic menu_music = new FTMusic();
+    // FTSound soundeff = new FTSound();
     //
 
     // private ArrayList<Drawable> drawables;
@@ -56,6 +57,8 @@ public class FullThrottle {
 
     private Text fpsCount;
     private boolean showFps = false;
+
+    private ProgressBar pb;
 
     public FullThrottle() {
         start();
@@ -201,7 +204,7 @@ public class FullThrottle {
 
 
         //Added stuff for the audio
-        menu_music.play_music("./res/Music/scorched_earth_original.ogg");
+        // menu_music.play_music("./res/Music/scorched_earth_original.ogg");
         //END of added stuff for the audio
 
 
@@ -232,12 +235,30 @@ public class FullThrottle {
         //     s.setPosition(32 + 54 * (i % 9), 32 + 54 * (i / 9));
         //     Renderer.addDrawable(s);
         // }
+
+        // Progress bar demo
+
+        Renderer.clear();
+
+        Texture fuelBar = new FTTexture("./res/FuelBar.png");
+        pb = new ProgressBar(
+            new Vector2f(400, 400), new Vector2f(350, 64), 100,
+            fuelBar, new Vector2i(16, 16),
+            80, new float[] {25, 50, 100}
+        );
+        Renderer.addDrawable(pb);
+        updatables.add(pb);
     }
 
     private void update() {
         for (Updatable u : updatables) {
             u.update();
         }
+
+        if (Input.getKeyDown(Key.LEFT))
+            System.out.println(pb.addToValue(-10));
+        if (Input.getKeyDown(Key.RIGHT))
+            System.out.println(pb.addToValue(10));
     }
 
     public static RenderWindow getWindow() {
@@ -253,7 +274,7 @@ public class FullThrottle {
 
     
     public void play_button_test_sounds() {
-        soundeff.play_sound("./res/SoundEffects/Play_sound.ogg");
+        // soundeff.play_sound("./res/SoundEffects/Play_sound.ogg");
     }
 
     public static void main(String[] args) {
