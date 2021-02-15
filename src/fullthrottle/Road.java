@@ -147,6 +147,14 @@ public final class Road implements Drawable, Updatable {
 
         columns = new ArrayList<>();
     }
+
+    public float getTopEdge() {
+        return FullThrottle.WINDOW_HEIGHT - (ROAD_TILE_SCALE * ROAD_TILE_DIMENSIONS.y * (lanes + 1));
+    }
+
+    public float getBottomEdge() {
+        return FullThrottle.WINDOW_HEIGHT - (ROAD_TILE_SCALE * ROAD_TILE_DIMENSIONS.y);
+    }
     
     /**
      * Generates the transition between road types
