@@ -201,7 +201,7 @@ public class FullThrottle {
         //FUEL BAR
         Texture fuelBar = new FTTexture("./res/FuelBar.png");
         pb = new ProgressBar(
-            new Vector2f(100, 400), new Vector2f(900, 64), 100,
+            new Vector2f(10, 10), new Vector2f(256, 64), 100,
             fuelBar, new Vector2i(16, 16),
             80, new float[] {25, 50, 100}
         );
@@ -232,9 +232,9 @@ public class FullThrottle {
             actualRoad.increaseSpeed(-5);
 
         if (Input.getKeyDown(Key.LEFT))
-            System.out.println(pb.addToValue(-10));
+            pb.addToValue(-10);
         if (Input.getKeyDown(Key.RIGHT))
-            System.out.println(pb.addToValue(10));
+            pb.addToValue(10);
             
         Vector2f moveDirection = Vector2f.ZERO;
         if (Input.getKey(Key.W))
