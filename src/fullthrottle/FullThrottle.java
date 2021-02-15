@@ -6,6 +6,8 @@ import java.util.ArrayList;
 
 import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.Color;
+import org.jsfml.graphics.ConstView;
+import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.Image;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderWindow;
@@ -13,23 +15,16 @@ import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Text;
 import org.jsfml.graphics.Texture;
 import org.jsfml.system.Vector2f;
-import org.jsfml.system.Vector2i;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.VideoMode;
 import org.jsfml.window.WindowStyle;
 import org.jsfml.window.event.Event;
 
-import fullthrottle.gfx.Animation;
+import fullthrottle.Road.RoadSection;
 import fullthrottle.gfx.FTTexture;
 import fullthrottle.gfx.ParallaxBackground;
 import fullthrottle.gfx.ParallaxBackground.Direction;
 import fullthrottle.gfx.Renderer;
-import fullthrottle.gfx.SpriteSequence;
-import fullthrottle.gfx.Spritesheet;
-import fullthrottle.sfx.FTMusic;
-import fullthrottle.sfx.FTSound;
-import fullthrottle.ui.Button;
-import fullthrottle.ui.Button.ActionType;
 import fullthrottle.ui.ButtonManager;
 import fullthrottle.ui.UI;
 import fullthrottle.util.Input;
@@ -49,6 +44,9 @@ public class FullThrottle {
 
     private Text fpsCount;
     private boolean showFps = false;
+
+    //Road demo
+    public Road actualRoad;
 
     public FullThrottle() {
         start();
@@ -186,12 +184,32 @@ public class FullThrottle {
         
         updatables.add(bg);
         Renderer.addDrawable(bg, 1000);
+        
+
+        //ROAD
+        actualRoad = new Road(4, 320);
+        Renderer.addDrawable(actualRoad);
+        updatables.add(actualRoad);
+        actualRoad.setSpeed(50);
     }
 
     private void update() {
         for (Updatable u : updatables) {
             u.update();
         }
+
+        if (Input.getKeyDown(Key.NUM1))
+            actualRoad.setRoadSection(RoadSection.WHITE);
+        if (Input.getKeyDown(Key.NUM2))
+            actualRoad.setRoadSection(RoadSection.YELLOW);
+        if (Input.getKeyDown(Key.NUM3))
+            actualRoad.setRoadSection(RoadSection.DIRT);
+
+        if (Input.getKeyDown(Key.UP))
+            actualRoad.increaseSpeed(5);
+        else if (Input.getKeyDown(Key.DOWN))
+            actualRoad.increaseSpeed(-5);
+
     }
 
     public static RenderWindow getWindow() {
@@ -199,6 +217,17 @@ public class FullThrottle {
             return window;
 
         return null;
+    }
+
+    /**
+     * Get the coordinates and size of the viewport of the window
+     * @return viewport as a FloatRect
+     */
+    public static FloatRect getViewRect() {
+        ConstView v = FullThrottle.getWindow().getView();
+        Vector2f halfSize = Vector2f.div(v.getSize(), 2f);
+        Vector2f vo = Vector2f.sub(v.getCenter(), halfSize);
+        return new FloatRect(vo, v.getSize());
     }
 
     // public void settings() {

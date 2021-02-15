@@ -1,5 +1,6 @@
 package fullthrottle.gfx;
 
+import fullthrottle.FullThrottle;
 import fullthrottle.util.TimeManager;
 import fullthrottle.util.Updatable;
 
@@ -238,7 +239,7 @@ public class ParallaxBackground implements Drawable, Updatable {
 
     @Override
     public void update() {
-        FloatRect vBounds = getViewRect(this.target);
+        FloatRect vBounds = FullThrottle.getViewRect();
 
         for (ArrayList<BackgroundElement> z : elements.values())
             for (BackgroundElement e : z)
@@ -247,23 +248,10 @@ public class ParallaxBackground implements Drawable, Updatable {
 
     @Override
     public void draw(RenderTarget target, RenderStates states) {
-        FloatRect vBounds = getViewRect(this.target);
+        FloatRect vBounds = FullThrottle.getViewRect();
         
         for (int i : zLayers)
             for (BackgroundElement e : elements.get(i))
                 e.draw(target, states, vBounds);
-    }
-
-    /**
-     * Get the coordinates and size of the viewport
-     * for the given RenderTarget
-     * @param target RenderTarget to get viewport of
-     * @return viewport as a FloatRect
-     */
-    private FloatRect getViewRect(RenderTarget target) {
-        ConstView v = target.getView();
-        Vector2f halfSize = Vector2f.div(v.getSize(), 2f);
-        Vector2f vo = Vector2f.sub(v.getCenter(), halfSize);
-        return new FloatRect(vo, v.getSize());
     }
 }
