@@ -15,6 +15,7 @@ import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Text;
 import org.jsfml.graphics.Texture;
 import org.jsfml.system.Vector2f;
+import org.jsfml.system.Vector2i;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.VideoMode;
 import org.jsfml.window.WindowStyle;
@@ -26,6 +27,7 @@ import fullthrottle.gfx.ParallaxBackground;
 import fullthrottle.gfx.ParallaxBackground.Direction;
 import fullthrottle.gfx.Renderer;
 import fullthrottle.ui.ButtonManager;
+import fullthrottle.ui.ProgressBar;
 import fullthrottle.ui.UI;
 import fullthrottle.util.Input;
 import fullthrottle.util.TimeManager;
@@ -47,6 +49,7 @@ public class FullThrottle {
 
     //Road demo
     public Road actualRoad;
+    private ProgressBar pb;
 
     public FullThrottle() {
         start();
@@ -191,6 +194,16 @@ public class FullThrottle {
         Renderer.addDrawable(actualRoad);
         updatables.add(actualRoad);
         actualRoad.setSpeed(50);
+
+        //FUEL BAR
+        Texture fuelBar = new FTTexture("./res/FuelBar.png");
+        pb = new ProgressBar(
+            new Vector2f(100, 400), new Vector2f(900, 64), 100,
+            fuelBar, new Vector2i(16, 16),
+            80, new float[] {25, 50, 100}
+        );
+        Renderer.addDrawable(pb);
+        updatables.add(pb);
     }
 
     private void update() {
@@ -210,6 +223,10 @@ public class FullThrottle {
         else if (Input.getKeyDown(Key.DOWN))
             actualRoad.increaseSpeed(-5);
 
+        if (Input.getKeyDown(Key.LEFT))
+            System.out.println(pb.addToValue(-10));
+        if (Input.getKeyDown(Key.RIGHT))
+            System.out.println(pb.addToValue(10));
     }
 
     public static RenderWindow getWindow() {
