@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-//Exprimental don't touch
-import org.jsfml.audio.Music;
 import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.Image;
@@ -21,6 +19,7 @@ import org.jsfml.window.VideoMode;
 import org.jsfml.window.WindowStyle;
 import org.jsfml.window.event.Event;
 
+import fullthrottle.debug.DebugRect;
 import fullthrottle.gfx.Animation;
 import fullthrottle.gfx.FTTexture;
 import fullthrottle.gfx.ParallaxBackground;
@@ -28,8 +27,6 @@ import fullthrottle.gfx.ParallaxBackground.Direction;
 import fullthrottle.gfx.Renderer;
 import fullthrottle.gfx.SpriteSequence;
 import fullthrottle.gfx.Spritesheet;
-import fullthrottle.sfx.FTMusic;
-import fullthrottle.sfx.FTSound;
 import fullthrottle.ui.Button;
 import fullthrottle.ui.Button.ActionType;
 import fullthrottle.ui.ButtonManager;
@@ -242,7 +239,7 @@ public class FullThrottle {
 
         Texture fuelBar = new FTTexture("./res/FuelBar.png");
         pb = new ProgressBar(
-            new Vector2f(400, 400), new Vector2f(350, 64), 100,
+            new Vector2f(100, 400), new Vector2f(900, 64), 100,
             fuelBar, new Vector2i(16, 16),
             80, new float[] {25, 50, 100}
         );

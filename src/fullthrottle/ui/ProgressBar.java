@@ -32,6 +32,9 @@ public class ProgressBar implements Drawable, Updatable {
 
     private VertexArray border;
 
+    private Vector2f[] positionOffsets;
+    private Vector2f[] textureOffsets;
+
     public ProgressBar(
         Vector2f position, Vector2f size, float max,
         Texture sheet, Vector2i spriteSize
@@ -56,44 +59,64 @@ public class ProgressBar implements Drawable, Updatable {
         this.spriteSize = new Vector2f(spriteSize);
 
         this.fillSpeed = DEFAULT_FILL_SPEED;
+        
+        positionOffsets = new Vector2f[] {
+            Vector2f.ZERO,
+            new Vector2f(this.size.y, 0),
+            new Vector2f(this.size.y, this.size.y),
+            new Vector2f(0, this.size.y)
+        };
+        
+        textureOffsets = new Vector2f[] {
+            Vector2f.ZERO,
+            new Vector2f(spriteSize.x, 0),
+            this.spriteSize,
+            new Vector2f(0, spriteSize.y)
+        };
 
         this.border = createBar(0, max);
     }
 
     private VertexArray createBar(int stage, float value) {
         VertexArray va = new VertexArray(PrimitiveType.QUADS);
-        // quick and dirty assuming tiles are square
-        Vector2f[] positionOffsets = new Vector2f[] {
-            Vector2f.ZERO,
-            new Vector2f(this.size.y, 0),
-            new Vector2f(this.size.y, this.size.y),
-            new Vector2f(0, this.size.y)
-        };
-        Vector2f[] textureOffsets = new Vector2f[] {
-            Vector2f.ZERO,
-            new Vector2f(spriteSize.x, 0),
-            this.spriteSize,
-            new Vector2f(0, spriteSize.y)
-        };
+        if (value == 0) return va;
+        float sections = (size.x / size.y) * (value / maxValue);
         Vector2f currentPosition = this.position;
         //Start of bar
+        float amount = 1;
+        if (sections < 2) {
+            amount = sections - 1;
+        }
+        if (amount < 0) amount = 0;
+
         for (int i = 0 ; i < 4; i++) {
+            if (amount <= 0) break;
             Vertex v = new Vertex(
                 Vector2f.add(
                     currentPosition,
-                    positionOffsets[i]
+                    Vector2f.componentwiseMul(
+                        positionOffsets[i],
+                        new Vector2f(amount, 1)
+                    )
                 ),
                 Vector2f.add(
                     new Vector2f(0, stage * spriteSize.y),
-                    textureOffsets[i]
+                    Vector2f.componentwiseMul(
+                        textureOffsets[i],
+                        new Vector2f(amount, 1)
+                    )
                 )
             );
             va.add(v);
         }
+        currentPosition = Vector2f.add(
+            currentPosition,
+            new Vector2f(this.size.y * amount, 0)
+        );
         //Middle of bar
-        float sections = (this.size.x / this.size.y) * (value / maxValue) - 2;
-        for (int i = 0; i < (int)sections; i++) {
-            currentPosition = Vector2f.add(currentPosition, new Vector2f(this.size.y, 0));
+        int middleSections = (int)sections - 2;
+        if (middleSections < 0) middleSections = 0;
+        for (int i = 0; i < middleSections; i++) {
             for (int j = 0; j < 4; j++) {
                 Vertex v = new Vertex(
                     Vector2f.add(
@@ -101,17 +124,23 @@ public class ProgressBar implements Drawable, Updatable {
                         positionOffsets[j]
                     ),
                     Vector2f.add(
-                        new Vector2f(spriteSize.x, stage * spriteSize.y),
+                        new Vector2f(
+                            spriteSize.x,
+                            stage * spriteSize.y
+                        ),
                         textureOffsets[j]
                     )
                 );
                 va.add(v);
             }
+            currentPosition = Vector2f.add(
+                currentPosition,
+                new Vector2f(this.size.y, 0)
+            );
         }
-        currentPosition = Vector2f.add(currentPosition, new Vector2f(this.size.y, 0));
         //Remainder
-        float remainder = sections - (int)sections;
-        if (remainder != 0) {
+        float remainder = sections - middleSections - 2;
+        if (remainder != 0 && sections > 2) {
             for (int i = 0; i < 4; i++) {
                 Vertex v = new Vertex(
                     Vector2f.add(
@@ -122,7 +151,10 @@ public class ProgressBar implements Drawable, Updatable {
                         )
                     ),
                     Vector2f.add(
-                        new Vector2f(spriteSize.x, stage * spriteSize.y),
+                        new Vector2f(
+                            spriteSize.x,
+                            stage * spriteSize.y
+                        ),
                         Vector2f.componentwiseMul(
                             textureOffsets[i],
                             new Vector2f(remainder, 1)
@@ -131,19 +163,38 @@ public class ProgressBar implements Drawable, Updatable {
                 );
                 va.add(v);
             }
-            currentPosition = Vector2f.add(currentPosition, new Vector2f(this.size.y * remainder, 0));
+            currentPosition = Vector2f.add(
+                currentPosition,
+                new Vector2f(this.size.y * remainder, 0)
+            );
         }
 
         //End
+        float endAmount = 1;
+        if (sections < 1) {
+            endAmount = sections;
+            if (endAmount <= 0) return va; 
+        }
         for (int i = 0 ; i < 4; i++) {
             Vertex v = new Vertex(
                 Vector2f.add(
                     currentPosition,
-                    positionOffsets[i]
+                    Vector2f.componentwiseMul(
+                        positionOffsets[i],
+                        new Vector2f(endAmount, 1)
+                    )
                 ),
                 Vector2f.add(
-                    new Vector2f(spriteSize.x * 2, stage * spriteSize.y),
-                    textureOffsets[i]
+                    new Vector2f(
+                        spriteSize.x * 2,
+                        stage * spriteSize.y
+                    ),
+                    new Vector2f(
+                        (textureOffsets[i].x == 0)
+                            ? 16 * (1 - endAmount)
+                            : textureOffsets[i].x,
+                        textureOffsets[i].y
+                    )
                 )
             );
             va.add(v);
@@ -153,7 +204,8 @@ public class ProgressBar implements Drawable, Updatable {
     }
 
     public void setValue(float newValue) {
-        if (newValue < 0 || newValue > maxValue) throw new IllegalArgumentException();
+        if (newValue < 0 || newValue > maxValue)
+            throw new IllegalArgumentException();
 
         currentValue = newValue;        
     }
