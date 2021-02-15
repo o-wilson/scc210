@@ -51,6 +51,9 @@ public class FullThrottle {
     public Road actualRoad;
     private ProgressBar pb;
 
+    //Movement test
+    public Player pPlayer;
+
     public FullThrottle() {
         start();
 
@@ -204,6 +207,11 @@ public class FullThrottle {
         );
         Renderer.addDrawable(pb);
         updatables.add(pb);
+        actualRoad.setSpeed(90);
+
+        //PLAYER
+        pPlayer = new Player();
+        Renderer.addDrawable(pPlayer, 0);
     }
 
     private void update() {
@@ -227,6 +235,18 @@ public class FullThrottle {
             System.out.println(pb.addToValue(-10));
         if (Input.getKeyDown(Key.RIGHT))
             System.out.println(pb.addToValue(10));
+            
+        Vector2f moveDirection = Vector2f.ZERO;
+        if (Input.getKey(Key.W))
+            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, -1));
+        else if (Input.getKey(Key.S))
+            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, 1));
+
+        if (Input.getKey(Key.A))
+            moveDirection = Vector2f.add(moveDirection, new Vector2f(-1, 0));
+        else if (Input.getKey(Key.D))
+            moveDirection = Vector2f.add(moveDirection, new Vector2f(1, 0));
+        pPlayer.move(moveDirection);
     }
 
     public static RenderWindow getWindow() {
