@@ -102,6 +102,7 @@ public class Button implements Observer, Drawable {
     private boolean heldRight;
 
     private boolean enabled;
+    private boolean visible;
     
     /**
      * Basic button with default UI sprite
@@ -153,6 +154,7 @@ public class Button implements Observer, Drawable {
         heldColor = Color.WHITE;
 
         enabled = true;
+        visible = true;
 
         actions = new ArrayList<ButtonAction>();
     }
@@ -243,6 +245,15 @@ public class Button implements Observer, Drawable {
 
         //if there's no change then no need to update anything
         if (!changed) return;
+    }
+
+    /**
+     * Changes whether the button is visible
+     * NB: user's responsibility to disable the button if needed
+     * @param b true = visible
+     */
+    public void setVisible(boolean b) {
+        this.visible = b;
     }
 
     /**
@@ -362,6 +373,8 @@ public class Button implements Observer, Drawable {
 
     @Override
     public void draw(RenderTarget target, RenderStates states) {
+        if (!visible) return;
+
         this.activeSprite = enabled ? enabledSprite : disabledSprite;
         this.activeSprite.setPosition(this.position);
         
