@@ -35,6 +35,8 @@ public class ProgressBar implements Drawable, Updatable {
     private Vector2f[] positionOffsets;
     private Vector2f[] textureOffsets;
 
+    private boolean lerpUpdate;
+
     public ProgressBar(
         Vector2f position, Vector2f size, float max,
         Texture sheet, Vector2i spriteSize
@@ -47,6 +49,8 @@ public class ProgressBar implements Drawable, Updatable {
         Texture sheet, Vector2i spriteSize,
         float startValue, float[] stages    
     ) {
+        this.lerpUpdate = true;
+
         this.position = position;
         this.size = size;
 
@@ -75,6 +79,10 @@ public class ProgressBar implements Drawable, Updatable {
         };
 
         this.border = createBar(0, max);
+    }
+
+    public void lerpUpdate(boolean lerp) {
+        this.lerpUpdate = lerp;
     }
 
     private VertexArray createBar(int stage, float value) {
@@ -225,6 +233,11 @@ public class ProgressBar implements Drawable, Updatable {
 
     @Override
     public void update() {
+        if (!lerpUpdate) {
+            displayValue = currentValue;
+            return;
+        }
+            
         displayValue += (currentValue - displayValue) * fillSpeed * TimeManager.deltaTime();
         if (Math.abs(currentValue - displayValue) < 0.1f) displayValue = currentValue;
     }
