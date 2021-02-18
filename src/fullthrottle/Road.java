@@ -24,6 +24,7 @@ import fullthrottle.util.Updatable;
  * only one should be needed
  */
 public final class Road implements Drawable, Updatable {
+    private boolean bVisible = true;
     /**
      * Dimensions of each tile in the spritesheet
      */
@@ -238,6 +239,7 @@ public final class Road implements Drawable, Updatable {
 
     @Override
     public void draw(RenderTarget arg0, RenderStates arg1) {
+        if (!bVisible) return;
         Vector2f drawPos = origin;
         VertexArray va = new VertexArray(PrimitiveType.QUADS);
         
@@ -354,6 +356,10 @@ public final class Road implements Drawable, Updatable {
         this.lastRoadSection = this.roadSection;
         this.roadSection = roadSection;
         generateTransitionColumns();
+    }
+
+    public void setVisible(boolean b) {
+        this.bVisible = b;
     }
 
     private class InvalidLaneCountException extends RuntimeException {

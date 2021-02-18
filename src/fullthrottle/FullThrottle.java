@@ -291,14 +291,17 @@ public class FullThrottle {
         
 
 
-        // Renderer.addDrawable(gameRoad);
+        Renderer.addDrawable(gameRoad);
+        gameRoad.setVisible(false);
         Renderer.addDrawable(fuelBar);
         fuelBar.setVisible(false);
 
-        // Renderer.addDrawable(pPlayer, 0);
+        Renderer.addDrawable(pPlayer, 0);
+        pPlayer.setVisible(false);
     }
 
     private void update() {
+        int iDir = 0;
         for (Updatable u : updatables) {
             u.update();
         }
@@ -321,16 +324,20 @@ public class FullThrottle {
             fuelBar.addToValue(10);
             
         Vector2f moveDirection = Vector2f.ZERO;
-        if (Input.getKey(Key.W))
-            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, -1));
-        else if (Input.getKey(Key.S))
-            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, 1));
-
-        if (Input.getKey(Key.A))
+        
+        if (Input.getKey(Key.A)){
             moveDirection = Vector2f.add(moveDirection, new Vector2f(-1, 0));
-        else if (Input.getKey(Key.D))
+            iDir = 1;}
+        else if (Input.getKey(Key.D)){
             moveDirection = Vector2f.add(moveDirection, new Vector2f(1, 0));
-        pPlayer.move(moveDirection);
+            iDir = 1;}
+        if (Input.getKey(Key.W)){
+            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, -1));
+            iDir = 0;}
+        else if (Input.getKey(Key.S)){
+            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, 1));
+            iDir = 0;}
+        pPlayer.move(moveDirection, iDir);
     }
 
     public static RenderWindow getWindow() {
@@ -365,6 +372,9 @@ public class FullThrottle {
         settingsButton.setEnabled(false);
         title.setVisible(false);
         leaderBoard.setVisible(false);
+        gameRoad.setVisible(true);
+        pPlayer.setVisible(true);
+        pPlayer.setActive(true);
     }
 
     public void showLeaderBoard() {
