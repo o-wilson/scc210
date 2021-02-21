@@ -101,7 +101,7 @@ public class FullThrottle {
             loadingBar.draw(window, new RenderStates(BlendMode.ALPHA));
 
             VertexArray va = new VertexArray(PrimitiveType.QUADS);
-            Color fadeAmount = new Color(0, 0, 0, (255/120) * i);
+            Color fadeAmount = new Color(0, 0, 0, (255 / 120) * i);
             va.add(new Vertex(Vector2f.ZERO, fadeAmount));
             va.add(new Vertex(new Vector2f(WINDOW_WIDTH, 0), fadeAmount));
             va.add(new Vertex(new Vector2f(WINDOW_WIDTH, WINDOW_HEIGHT), fadeAmount));
@@ -115,12 +115,13 @@ public class FullThrottle {
 
         loadingBar.lerpUpdate(true);
         for (int i = 20; i < 120; i++) {
-            if (i > 30 && i < 80) loadingBar.setValue(i);
+            if (i > 30 && i < 80)
+                loadingBar.setValue(i);
             else if (i >= 80)
                 loadingBar.setValue(((i / 2f) + 40 <= 100) ? (i / 2f) + 40 : 100);
             else
                 loadingBar.setValue((i / 2f) + 10);
-            
+
             TimeManager.update();
             loadingBar.update();
             window.clear();
@@ -210,28 +211,19 @@ public class FullThrottle {
         // Load menu elements
         Texture settingsT = new FTTexture("./res/Settings.png");
         Sprite settingsS = new Sprite(settingsT);
-        settingsButton = new Button(
-            new Vector2f(10, 10), new Vector2i(64, 64),
-            settingsS, UI.SpriteFillMode.STRETCH
-        );
+        settingsButton = new Button(new Vector2f(10, 10), new Vector2i(64, 64), settingsS, UI.SpriteFillMode.STRETCH);
         // settingsButton.addAction(this, "settings", ActionType.LEFT_CLICK);
         buttonManager.addObserver(settingsButton);
-        
-        playButton = new PlayButton(
-            Vector2f.ZERO, new Vector2i(192, 96)
-        );
+
+        playButton = new PlayButton(Vector2f.ZERO, new Vector2i(192, 96));
         playButton.addAction(this, "startGame", ActionType.LEFT_CLICK);
         buttonManager.addObserver(playButton);
 
-        highScoreButton = new HighScoresButton(
-            Vector2f.ZERO, new Vector2i(192, 96)
-        );
+        highScoreButton = new HighScoresButton(Vector2f.ZERO, new Vector2i(192, 96));
         highScoreButton.addAction(this, "showLeaderBoard", ActionType.LEFT_CLICK);
         buttonManager.addObserver(highScoreButton);
 
         leaderBoard = new LeaderBoard();
-
-
 
         background = new ParallaxBackground(window, Direction.LEFT, 3000);
 
@@ -253,21 +245,16 @@ public class FullThrottle {
         background.addElement(buildingsS, 15, Vector2f.ZERO);
         background.addElement(roadS, 5, Vector2f.ZERO);
         background.addElement(bushS, 5, new Vector2f(1000, 506.25f), 500);
-        
+
         updatables.add(background);
-
-
 
         // Load game elements
         gameRoad = new Road(4, 320);
         updatables.add(gameRoad);
         gameRoad.setSpeed(50);
 
-        fuelBar = new ProgressBar(
-            new Vector2f(10, 10), new Vector2f(256, 64), 100,
-            new FTTexture("./res/FuelBar.png"), new Vector2i(16, 16),
-            80, new float[] {25, 50, 100}
-        );
+        fuelBar = new ProgressBar(new Vector2f(10, 10), new Vector2f(256, 64), 100, new FTTexture("./res/FuelBar.png"),
+                new Vector2i(16, 16), 80, new float[] { 25, 50, 100 });
         updatables.add(fuelBar);
 
         pPlayer = new Player();
@@ -283,13 +270,11 @@ public class FullThrottle {
         Renderer.addDrawable(settingsButton);
         Renderer.addDrawable(playButton);
         Renderer.addDrawable(highScoreButton);
-        
+
         Renderer.addDrawable(background, 1000);
 
         Renderer.addDrawable(leaderBoard);
         leaderBoard.setVisible(false);
-        
-
 
         // Renderer.addDrawable(gameRoad);
         Renderer.addDrawable(fuelBar);
@@ -319,7 +304,7 @@ public class FullThrottle {
             fuelBar.addToValue(-10);
         if (Input.getKeyDown(Key.RIGHT))
             fuelBar.addToValue(10);
-            
+
         Vector2f moveDirection = Vector2f.ZERO;
         if (Input.getKey(Key.W))
             moveDirection = Vector2f.add(moveDirection, new Vector2f(0, -1));
@@ -342,6 +327,7 @@ public class FullThrottle {
 
     /**
      * Get the coordinates and size of the viewport of the window
+     * 
      * @return viewport as a FloatRect
      */
     public static FloatRect getViewRect() {
