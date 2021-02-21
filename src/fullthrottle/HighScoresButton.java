@@ -50,8 +50,6 @@ public final class HighScoresButton extends Button {
         this.addAction(this, "hsButtonLeftClick", ActionType.LEFT_CLICK);
         this.addAction(this, "hsButtonEnter", ActionType.ENTER);
         this.addAction(this, "hsButtonExit", ActionType.EXIT);
-
-        Renderer.addDrawable(this);
     }
 
     public void hsButtonEnter() {
@@ -69,6 +67,6 @@ public final class HighScoresButton extends Button {
     }
 
     public void hsButtonLeftClick() {
-        System.out.println("High Scores Button pressed");
+        // System.out.println("High Scores Button pressed");
     }
 }

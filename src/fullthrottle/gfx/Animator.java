@@ -3,6 +3,7 @@ package fullthrottle.gfx;
 import java.util.HashMap;
 
 import org.jsfml.graphics.Color;
+import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
@@ -14,7 +15,12 @@ public class Animator extends Sprite {
     private Animation currentAnimation;
 
     public class NoSuchAnimationException extends RuntimeException {
-        public NoSuchAnimationException() {
+        /**
+		 *
+		 */
+		private static final long serialVersionUID = 2263582322284391849L;
+
+		public NoSuchAnimationException() {
             super("This animator has no animations yet");
         }
         
@@ -92,5 +98,12 @@ public class Animator extends Sprite {
         for (Animation a : animations.values())
             a.setScale(arg0);
         super.setScale(arg0);
+    }
+
+    @Override
+    public FloatRect getGlobalBounds() {
+        if (currentAnimation == null)
+            throw new NoSuchAnimationException();
+        return currentAnimation.getGlobalBounds();
     }
 }

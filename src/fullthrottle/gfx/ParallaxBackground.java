@@ -1,5 +1,6 @@
 package fullthrottle.gfx;
 
+import fullthrottle.FullThrottle;
 import fullthrottle.util.TimeManager;
 import fullthrottle.util.Updatable;
 
@@ -27,11 +28,16 @@ import java.util.HashMap;
 public class ParallaxBackground implements Drawable, Updatable {
     
     /**
-     * Thrown if the user attempts to add an element to a layer <= 0
+     * Thrown if the user attempts to add an element to a layer &lt;= 0
      * 0 would cause a div by 0, -ve would move elements in the
      * opposite direction which isn't handled by the rendering
      */
     public class InvalidIndexException extends RuntimeException {
+        /**
+         *
+         */
+        private static final long serialVersionUID = -6567041962550312019L;
+
         public InvalidIndexException(int index) {
             super("Invalid Z-Index: " + index);
         }
@@ -183,9 +189,9 @@ public class ParallaxBackground implements Drawable, Updatable {
      * loop frequency
      * @param s sprite to be drawn
      * @param zIndex layer to be drawn on (higher = further back)
-     * CANNOT BE <= 0, will throw InvalidIndexException
+     * CANNOT BE &lt;= 0, will throw InvalidIndexException
      * @param startPos position for sprite to start at
-     * @throws InvalidIndexException if index <= 0 given
+     * @throws InvalidIndexException if index &lt;= 0 given
      */
     public void addElement(
         Sprite s, int zIndex, Vector2f startPos
@@ -200,11 +206,11 @@ public class ParallaxBackground implements Drawable, Updatable {
      * add an element to the background with a specified frequency
      * @param s sprite to be drawn
      * @param zIndex layer to be drawn on (higher = further back)
-     * CANNOT BE <= 0, will throw InvalidIndexException
+     * CANNOT BE &lt;= 0, will throw InvalidIndexException
      * @param startPos position for sprite to start at
      * @param loopFrequency distance (including sprite width) between
      * looping elements
-     * @throws InvalidIndexException if index <= 0 given
+     * @throws InvalidIndexException if index &lt;= 0 given
      */
     public void addElement(
         Sprite s, int zIndex, Vector2f startPos,
@@ -233,7 +239,7 @@ public class ParallaxBackground implements Drawable, Updatable {
 
     @Override
     public void update() {
-        FloatRect vBounds = getViewRect(this.target);
+        FloatRect vBounds = FullThrottle.getViewRect();
 
         for (ArrayList<BackgroundElement> z : elements.values())
             for (BackgroundElement e : z)
@@ -242,23 +248,10 @@ public class ParallaxBackground implements Drawable, Updatable {
 
     @Override
     public void draw(RenderTarget target, RenderStates states) {
-        FloatRect vBounds = getViewRect(this.target);
+        FloatRect vBounds = FullThrottle.getViewRect();
         
         for (int i : zLayers)
             for (BackgroundElement e : elements.get(i))
                 e.draw(target, states, vBounds);
-    }
-
-    /**
-     * Get the coordinates and size of the viewport
-     * for the given RenderTarget
-     * @param target RenderTarget to get viewport of
-     * @return viewport as a FloatRect
-     */
-    private FloatRect getViewRect(RenderTarget target) {
-        ConstView v = target.getView();
-        Vector2f halfSize = Vector2f.div(v.getSize(), 2f);
-        Vector2f vo = Vector2f.sub(v.getCenter(), halfSize);
-        return new FloatRect(vo, v.getSize());
     }
 }

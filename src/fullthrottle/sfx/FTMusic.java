@@ -6,22 +6,22 @@ import java.nio.file.Paths;
 
 public class FTMusic extends Music {
 
-
-    public FTMusic(String path) {
-        super();
-
+    
+    
+    public void play_music(String path)
+    {
+        
         try {
             openFromFile(Paths.get(path));
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-        setLoop(true);
-        play();
 
+        setLoop(true);
+      play();
     }
 
     
-
 }
 
