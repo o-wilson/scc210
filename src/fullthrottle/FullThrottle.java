@@ -301,7 +301,6 @@ public class FullThrottle {
     }
 
     private void update() {
-        int iDir = 0;
         for (Updatable u : updatables) {
             u.update();
         }
@@ -323,21 +322,20 @@ public class FullThrottle {
         if (Input.getKeyDown(Key.RIGHT))
             fuelBar.addToValue(10);
             
-        Vector2f moveDirection = Vector2f.ZERO;
+
         
-        if (Input.getKey(Key.A)){
+        Vector2f moveDirection = Vector2f.ZERO;
+    
+        if (Input.getKey(Key.A))
             moveDirection = Vector2f.add(moveDirection, new Vector2f(-1, 0));
-            iDir = 1;}
-        else if (Input.getKey(Key.D)){
+        else if (Input.getKey(Key.D))
             moveDirection = Vector2f.add(moveDirection, new Vector2f(1, 0));
-            iDir = 1;}
-        if (Input.getKey(Key.W)){
+        if (Input.getKey(Key.W))
             moveDirection = Vector2f.add(moveDirection, new Vector2f(0, -1));
-            iDir = 0;}
-        else if (Input.getKey(Key.S)){
+        else if (Input.getKey(Key.S))
             moveDirection = Vector2f.add(moveDirection, new Vector2f(0, 1));
-            iDir = 0;}
-        pPlayer.move(moveDirection, iDir);
+
+        pPlayer.move(moveDirection);
     }
 
     public static RenderWindow getWindow() {
