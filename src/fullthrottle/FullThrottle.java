@@ -77,6 +77,10 @@ public class FullThrottle {
     // Movement test
     public Player pPlayer;
 
+    // Misc Testing
+    public Obstacle o;
+    public Obstacle o2;
+
     public FullThrottle() {
         init();
 
@@ -180,6 +184,11 @@ public class FullThrottle {
             window.clear(Color.BLACK);
 
             Renderer.render(window);
+            VertexArray va = o.getVertexArray();
+            VertexArray va2 = o2.getVertexArray();
+            RenderStates rs = new RenderStates(new RenderStates(BlendMode.ALPHA), Obstacle.OBSTACLE_SPRITE_SHEET);
+            va.draw(window, rs);
+            va2.draw(window, rs);
 
             if (Input.getKeyDown(Key.F3))
                 showFps = !showFps;
@@ -301,9 +310,20 @@ public class FullThrottle {
         fuelBar.setVisible(false);
 
         // Renderer.addDrawable(pPlayer, 0);
+
+        Renderer.clear();
+
+        Renderer.addDrawable(gameRoad);
+        o = new Obstacle(Obstacle.ObstacleType.CAR_1);
+        o2 = new Obstacle(Obstacle.ObstacleType.CAR_2);
     }
 
     private void update() {
+        if (!o.move(-50 * TimeManager.deltaTime())) {
+            System.out.println("off screen");
+        }
+        o2.move(-50 * TimeManager.deltaTime());
+
         for (Updatable u : updatables) {
             u.update();
         }
