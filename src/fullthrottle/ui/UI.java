@@ -28,6 +28,10 @@ public final class UI {
         "./res/ThaleahFat.ttf"
     );
 
+    public static Texture UPGRADE_MARKER_TEXTURE = new FTTexture(
+        "./res/shop/UpgradeMarkers.png"
+    );
+
     /**
      * Modes for displaying the button's sprite
      */
