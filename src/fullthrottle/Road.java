@@ -325,7 +325,6 @@ public final class Road implements Drawable, Updatable {
             generateColumn();
             if (rand.nextInt(3) == 1) {
                 generateObstacle(columns.size());
-                System.out.println("Generated Obstacle");
             }
         }
 

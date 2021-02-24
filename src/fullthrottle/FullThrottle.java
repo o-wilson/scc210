@@ -180,9 +180,6 @@ public class FullThrottle {
             window.clear(Color.BLACK);
 
             Renderer.render(window);
-            // VertexArray va = o.getVertexArray();
-            // RenderStates rs = new RenderStates(new RenderStates(BlendMode.ALPHA), Obstacle.OBSTACLE_SPRITE_SHEET);
-            // va.draw(window, rs);
 
             if (Input.getKeyDown(Key.F3))
                 showFps = !showFps;
@@ -245,22 +242,22 @@ public class FullThrottle {
 
         Texture sky = new FTTexture("./res/BackgroundTest/Sky.png");
         Texture buildings = new FTTexture("./res/BackgroundTest/Buildings.png");
-        Texture road = new FTTexture("./res/BackgroundTest/Road.png");
-        Texture bush = new FTTexture("./res/BackgroundTest/Bush.png");
+        // Texture road = new FTTexture("./res/BackgroundTest/Road.png");
+        // Texture bush = new FTTexture("./res/BackgroundTest/Bush.png");
 
         Sprite skyS = new Sprite(sky);
         skyS.scale(2.8125f, 2.8125f);
         Sprite buildingsS = new Sprite(buildings);
         buildingsS.scale(2.8125f, 2.8125f);
-        Sprite roadS = new Sprite(road);
-        roadS.scale(2.8125f, 2.8125f);
-        Sprite bushS = new Sprite(bush);
-        bushS.scale(2.8125f, 2.8125f);
+        // Sprite roadS = new Sprite(road);
+        // roadS.scale(2.8125f, 2.8125f);
+        // Sprite bushS = new Sprite(bush);
+        // bushS.scale(2.8125f, 2.8125f);
 
         background.addElement(skyS, 30, Vector2f.ZERO);
         background.addElement(buildingsS, 15, Vector2f.ZERO);
-        background.addElement(roadS, 5, Vector2f.ZERO);
-        background.addElement(bushS, 5, new Vector2f(1000, 506.25f), 500);
+        // background.addElement(roadS, 5, Vector2f.ZERO);
+        // background.addElement(bushS, 5, new Vector2f(1000, 506.25f), 500);
         
         updatables.add(background);
 
@@ -288,9 +285,9 @@ public class FullThrottle {
         title.setPosition(title.getGlobalBounds().left, 50);
         Renderer.addDrawable(title);
 
-        Renderer.addDrawable(settingsButton);
-        Renderer.addDrawable(playButton);
-        Renderer.addDrawable(highScoreButton);
+        Renderer.addDrawable(settingsButton, -50);
+        Renderer.addDrawable(playButton, -50);
+        Renderer.addDrawable(highScoreButton, -50);
         
         Renderer.addDrawable(background, 1000);
 
@@ -303,19 +300,12 @@ public class FullThrottle {
         Renderer.addDrawable(fuelBar);
         fuelBar.setVisible(false);
 
-        // Renderer.addDrawable(pPlayer, 0);
-
-        Renderer.clear();
+        Renderer.addDrawable(pPlayer, 0);
 
         Renderer.addDrawable(gameRoad);
-        // o = new Obstacle(Obstacle.ObstacleType.CAR_11);
     }
 
     private void update() {
-        // if (!o.move(-50 * TimeManager.deltaTime())) {
-        //     ArrayList<ObstacleType> obs = Obstacle.ObstacleType.getObstaclesForSection(gameRoad.getRoadSection());
-        //     o = new Obstacle(obs.get(new Random().nextInt(obs.size())));
-        // }
 
         for (Updatable u : updatables) {
             u.update();

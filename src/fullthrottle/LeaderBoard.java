@@ -136,6 +136,8 @@ public final class LeaderBoard extends UISprite {
         for (Text t : texts)
             t.draw(target, rs);
 
+        if (scores.size() == 0) return;
+
         int[] topScores = new int[] {0, 0, 0};
         int p = 0;
         for (int i = 0; i < 3; i++) {
