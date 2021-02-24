@@ -14,6 +14,7 @@ import org.jsfml.graphics.VertexArray;
 import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 
+import fullthrottle.Obstacle.ObstacleType;
 import fullthrottle.gfx.FTTexture;
 import fullthrottle.util.TimeManager;
 import fullthrottle.util.Updatable;
@@ -64,6 +65,10 @@ public final class Road implements Drawable, Updatable {
     private Random rand;
 
     private Vector2f origin;
+
+    private ArrayList<Obstacle> obstacles;
+
+    private ArrayList<ObstacleType> currentAllowedObstacles;
 
     /**
      * Holds information about the structure and sections of the
@@ -146,6 +151,8 @@ public final class Road implements Drawable, Updatable {
         );
 
         columns = new ArrayList<>();
+        obstacles = new ArrayList<>();
+        currentAllowedObstacles = ObstacleType.getObstaclesForSection(rS);
     }
 
     public float getTopEdge() {
@@ -154,6 +161,10 @@ public final class Road implements Drawable, Updatable {
 
     public float getBottomEdge() {
         return FullThrottle.WINDOW_HEIGHT - (ROAD_TILE_SCALE * ROAD_TILE_DIMENSIONS.y);
+    }
+
+    public float getLanePos(int lane) {
+        return getTopEdge() + (lane * ROAD_TILE_SCALE * ROAD_TILE_DIMENSIONS.y);
     }
     
     /**
@@ -236,6 +247,14 @@ public final class Road implements Drawable, Updatable {
         columns.add(nextColumn);
     }
 
+    private void generateObstacle(int column) {
+        ObstacleType type = currentAllowedObstacles.get(rand.nextInt(currentAllowedObstacles.size()));
+
+        float scaleFactor = (ROAD_TILE_SCALE * ROAD_TILE_DIMENSIONS.y) / Obstacle.OBSTACLE_SPRITE_SIZE.y;
+        Obstacle o = new Obstacle(type, new Vector2f(column * ROAD_TILE_DIMENSIONS.x * ROAD_TILE_SCALE, getLanePos(rand.nextInt(lanes))), scaleFactor);
+        obstacles.add(o);
+    }
+
     @Override
     public void draw(RenderTarget arg0, RenderStates arg1) {
         Vector2f drawPos = origin;
@@ -267,13 +286,6 @@ public final class Road implements Drawable, Updatable {
                 );
             }
             //Update drawPos to top of next column
-            // drawPos = Vector2f.add(
-            //     drawPos,
-            //     Vector2f.mul(new Vector2f(
-            //         ROAD_TILE_DIMENSIONS.x,
-            //         -ROAD_TILE_DIMENSIONS.y * c.length
-            //     ), ROAD_TILE_SCALE)
-            // );
             drawPos = new Vector2f(
                 drawPos.x + ROAD_TILE_SCALE * ROAD_TILE_DIMENSIONS.x,
                 origin.y
@@ -284,6 +296,13 @@ public final class Road implements Drawable, Updatable {
         RenderStates rs = new RenderStates(arg1, ROAD_TEXTURE);
         //Draw VertexArray
         va.draw(arg0, rs);
+
+        VertexArray obVA = new VertexArray(PrimitiveType.QUADS);
+        for (Obstacle o : obstacles) {
+            obVA.addAll(o.getVertexArray());
+        }
+        RenderStates obRS = new RenderStates(arg1, Obstacle.OBSTACLE_SPRITE_SHEET);
+        obVA.draw(arg0, obRS);
     }
 
     @Override
@@ -297,13 +316,17 @@ public final class Road implements Drawable, Updatable {
         //     400, 0, 600, FullThrottle.WINDOW_HEIGHT
         // );
 
-        origin = Vector2f.sub(origin, new Vector2f(
-            speed * TimeManager.deltaTime(), 0
-        ));
+        float dX = speed * TimeManager.deltaTime();
+        
+        origin = Vector2f.sub(origin, new Vector2f(dX, 0));
 
         float tileWidth = ROAD_TILE_DIMENSIONS.x * ROAD_TILE_SCALE;
         while ((columns.size() - 1) * tileWidth < vBounds.width) {
             generateColumn();
+            if (rand.nextInt(3) == 1) {
+                generateObstacle(columns.size());
+                System.out.println("Generated Obstacle");
+            }
         }
 
         if (origin.x < vBounds.left - tileWidth) {
@@ -315,6 +338,13 @@ public final class Road implements Drawable, Updatable {
             if (columns.size() != 0)
                 columns.remove(0);
         }
+
+        ArrayList<Obstacle> offscreenObstacles = new ArrayList<>();
+        for (Obstacle o : obstacles) {
+            if (!o.move(dX))
+                offscreenObstacles.add(o);
+        }
+        obstacles.removeAll(offscreenObstacles);
     }
 
     /**
@@ -353,7 +383,12 @@ public final class Road implements Drawable, Updatable {
     public void setRoadSection(RoadSection roadSection) {
         this.lastRoadSection = this.roadSection;
         this.roadSection = roadSection;
+        currentAllowedObstacles = ObstacleType.getObstaclesForSection(roadSection);
         generateTransitionColumns();
+    }
+    
+    public RoadSection getRoadSection() {
+        return roadSection;
     }
 
     private class InvalidLaneCountException extends RuntimeException {

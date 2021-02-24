@@ -3,6 +3,7 @@ package fullthrottle;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.Color;
@@ -24,16 +25,12 @@ import org.jsfml.window.VideoMode;
 import org.jsfml.window.WindowStyle;
 import org.jsfml.window.event.Event;
 
+import fullthrottle.Obstacle.ObstacleType;
 import fullthrottle.Road.RoadSection;
 import fullthrottle.gfx.FTTexture;
 import fullthrottle.gfx.ParallaxBackground;
 import fullthrottle.gfx.ParallaxBackground.Direction;
 import fullthrottle.gfx.Renderer;
-import fullthrottle.gfx.SpriteSequence;
-import fullthrottle.gfx.Spritesheet;
-import fullthrottle.sfx.FTMusic;
-import fullthrottle.shop.UpgradeMarker;
-import fullthrottle.shop.UpgradePath;
 import fullthrottle.ui.Button;
 import fullthrottle.ui.Button.ActionType;
 import fullthrottle.ui.ButtonManager;
@@ -79,7 +76,6 @@ public class FullThrottle {
 
     // Misc Testing
     public Obstacle o;
-    public Obstacle o2;
 
     public FullThrottle() {
         init();
@@ -184,11 +180,9 @@ public class FullThrottle {
             window.clear(Color.BLACK);
 
             Renderer.render(window);
-            VertexArray va = o.getVertexArray();
-            VertexArray va2 = o2.getVertexArray();
-            RenderStates rs = new RenderStates(new RenderStates(BlendMode.ALPHA), Obstacle.OBSTACLE_SPRITE_SHEET);
-            va.draw(window, rs);
-            va2.draw(window, rs);
+            // VertexArray va = o.getVertexArray();
+            // RenderStates rs = new RenderStates(new RenderStates(BlendMode.ALPHA), Obstacle.OBSTACLE_SPRITE_SHEET);
+            // va.draw(window, rs);
 
             if (Input.getKeyDown(Key.F3))
                 showFps = !showFps;
@@ -314,15 +308,14 @@ public class FullThrottle {
         Renderer.clear();
 
         Renderer.addDrawable(gameRoad);
-        o = new Obstacle(Obstacle.ObstacleType.CAR_1);
-        o2 = new Obstacle(Obstacle.ObstacleType.CAR_2);
+        // o = new Obstacle(Obstacle.ObstacleType.CAR_11);
     }
 
     private void update() {
-        if (!o.move(-50 * TimeManager.deltaTime())) {
-            System.out.println("off screen");
-        }
-        o2.move(-50 * TimeManager.deltaTime());
+        // if (!o.move(-50 * TimeManager.deltaTime())) {
+        //     ArrayList<ObstacleType> obs = Obstacle.ObstacleType.getObstaclesForSection(gameRoad.getRoadSection());
+        //     o = new Obstacle(obs.get(new Random().nextInt(obs.size())));
+        // }
 
         for (Updatable u : updatables) {
             u.update();

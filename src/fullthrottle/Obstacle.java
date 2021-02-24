@@ -26,8 +26,17 @@ public class Obstacle {
     };
 
     public enum ObstacleType {
-        CAR_1(0, 2, 12, 50, new FloatRect(0, 0, 16, 16), new RoadSection[] {RoadSection.YELLOW}),
-        CAR_2(1, 2, 12, 80, new FloatRect(0, 0, 16, 16), new RoadSection[] {RoadSection.WHITE, RoadSection.DIRT})
+        CAR_1(0, 2, 10, 120, new FloatRect(0, 0, 16, 16), new RoadSection[] {RoadSection.YELLOW}),
+        CAR_2(1, 2, 10, 110, new FloatRect(0, 0, 16, 16), new RoadSection[] {RoadSection.YELLOW}),
+        CAR_3(2, 2, 10, 125, new FloatRect(0, 0, 16, 16), new RoadSection[] {RoadSection.YELLOW}),
+        CAR_4(3, 2, 7, 80, new FloatRect(0, 0, 16, 16), new RoadSection[] {RoadSection.YELLOW}),
+        CAR_5(4, 2, 8, 100, new FloatRect(0, 0, 16, 16), new RoadSection[] {RoadSection.YELLOW}),
+        CAR_6(5, 2, 10, 110, new FloatRect(0, 0, 16, 16), new RoadSection[] {RoadSection.WHITE}),
+        CAR_7(6, 2, 8, 100, new FloatRect(0, 0, 16, 16), new RoadSection[] {RoadSection.WHITE}),
+        CAR_8(7, 2, 8, 90, new FloatRect(0, 0, 16, 16), new RoadSection[] {RoadSection.WHITE}),
+        CAR_9(8, 2, 10, 110, new FloatRect(0, 0, 16, 16), new RoadSection[] {RoadSection.WHITE}),
+        CAR_10(9, 2, 13, 140, new FloatRect(0, 0, 16, 16), new RoadSection[] {RoadSection.YELLOW, RoadSection.WHITE, RoadSection.DIRT}),
+        CAR_11(10, 2, 13, 180, new FloatRect(0, 0, 16, 16), new RoadSection[] {RoadSection.YELLOW, RoadSection.WHITE, RoadSection.DIRT})
         ;
         
         public final int obstacleIndex;
@@ -68,7 +77,7 @@ public class Obstacle {
     private float timeToNextFrame;
     private float currentTimeToNextFrame;
 
-    public Obstacle(ObstacleType t) {
+    public Obstacle(ObstacleType t, Vector2f pos, float scale) {
         this.type = t;
         
         this.frameCount = t.frames;
@@ -76,13 +85,13 @@ public class Obstacle {
         this.timeToNextFrame = 1f / ((type.fps != 0) ? type.fps : 1);
         this.currentTimeToNextFrame = timeToNextFrame;
 
-        this.position = new Vector2f(900, 400);
-        this.scale = 3;
+        this.position = pos;
+        this.scale = scale;
     }
     
     public boolean move(float dXPos) {
-        dXPos -= type.moveSpeed * TimeManager.deltaTime();
-        position = Vector2f.add(position, new Vector2f(dXPos, 0));
+        dXPos += type.moveSpeed * TimeManager.deltaTime();
+        position = Vector2f.sub(position, new Vector2f(dXPos, 0));
         
         return position.x + (OBSTACLE_SPRITE_SIZE.x * scale) > 0;
     }
