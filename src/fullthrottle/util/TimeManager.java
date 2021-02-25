@@ -27,6 +27,10 @@ public final class TimeManager {
         return frameCount;
     }
 
+    public static float elapsedTime() {
+        return clock.getElapsedTime().asSeconds();
+    }
+
     /**
      * Get time elapsed since last frame
      * @return float value of time in seconds since last frame

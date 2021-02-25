@@ -1,6 +1,7 @@
 package fullthrottle;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 import org.jsfml.graphics.Drawable;
@@ -14,6 +15,8 @@ import org.jsfml.graphics.VertexArray;
 import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 
+import fullthrottle.Obstacle.ObstacleType;
+import fullthrottle.gfx.Animation;
 import fullthrottle.gfx.FTTexture;
 import fullthrottle.util.TimeManager;
 import fullthrottle.util.Updatable;
@@ -24,6 +27,8 @@ import fullthrottle.util.Updatable;
  * only one should be needed
  */
 public final class Road implements Drawable, Updatable {
+    private boolean bVisible;
+    private boolean generateObstacles;
     /**
      * Dimensions of each tile in the spritesheet
      */
@@ -64,6 +69,12 @@ public final class Road implements Drawable, Updatable {
     private Random rand;
 
     private Vector2f origin;
+
+    private HashMap<Integer, ArrayList<Obstacle>> obstacles;
+
+    private Animation explosion;
+
+    private ArrayList<ObstacleType> currentAllowedObstacles;
 
     /**
      * Holds information about the structure and sections of the
@@ -146,6 +157,16 @@ public final class Road implements Drawable, Updatable {
         );
 
         columns = new ArrayList<>();
+        obstacles = new HashMap<>();
+        for (int i = 0; i < lanes; i++) {
+            obstacles.put(i, new ArrayList<Obstacle>());
+        }
+        currentAllowedObstacles = ObstacleType.getObstaclesForSection(rS);
+
+        explosion = new Animation(Obstacle.OBSTACLE_EXPLOSION_SEQUENCE, 16, false);
+        explosion.scale(new Vector2f(ROAD_TILE_SCALE, ROAD_TILE_SCALE));
+        explosion.restart();
+        explosion.pause();
     }
 
     public float getTopEdge() {
@@ -154,6 +175,10 @@ public final class Road implements Drawable, Updatable {
 
     public float getBottomEdge() {
         return FullThrottle.WINDOW_HEIGHT - (ROAD_TILE_SCALE * ROAD_TILE_DIMENSIONS.y);
+    }
+
+    public float getLanePos(int lane) {
+        return getTopEdge() + (lane * ROAD_TILE_SCALE * ROAD_TILE_DIMENSIONS.y);
     }
     
     /**
@@ -236,8 +261,18 @@ public final class Road implements Drawable, Updatable {
         columns.add(nextColumn);
     }
 
+    private void generateObstacle(int column) {
+        ObstacleType type = currentAllowedObstacles.get(rand.nextInt(currentAllowedObstacles.size()));
+
+        float scaleFactor = (ROAD_TILE_SCALE * ROAD_TILE_DIMENSIONS.y) / Obstacle.OBSTACLE_SPRITE_SIZE.y;
+        int lane = rand.nextInt(lanes);
+        Obstacle o = new Obstacle(type, new Vector2f(column * ROAD_TILE_DIMENSIONS.x * ROAD_TILE_SCALE, getLanePos(lane)), scaleFactor);
+        obstacles.get(lane).add(o);
+    }
+
     @Override
     public void draw(RenderTarget arg0, RenderStates arg1) {
+        if (!bVisible) return;
         Vector2f drawPos = origin;
         VertexArray va = new VertexArray(PrimitiveType.QUADS);
         
@@ -267,13 +302,6 @@ public final class Road implements Drawable, Updatable {
                 );
             }
             //Update drawPos to top of next column
-            // drawPos = Vector2f.add(
-            //     drawPos,
-            //     Vector2f.mul(new Vector2f(
-            //         ROAD_TILE_DIMENSIONS.x,
-            //         -ROAD_TILE_DIMENSIONS.y * c.length
-            //     ), ROAD_TILE_SCALE)
-            // );
             drawPos = new Vector2f(
                 drawPos.x + ROAD_TILE_SCALE * ROAD_TILE_DIMENSIONS.x,
                 origin.y
@@ -284,6 +312,19 @@ public final class Road implements Drawable, Updatable {
         RenderStates rs = new RenderStates(arg1, ROAD_TEXTURE);
         //Draw VertexArray
         va.draw(arg0, rs);
+        // System.out.println("Start obst draw");
+        VertexArray obVA = new VertexArray(PrimitiveType.QUADS);
+        RenderStates obRS = new RenderStates(arg1, Obstacle.OBSTACLE_SPRITE_SHEET);
+        for (ArrayList<Obstacle> l : obstacles.values()) {
+            for (Obstacle o : l) {
+                obVA.addAll(o.getVertexArray());
+            }
+        }
+        obVA.draw(arg0, obRS);
+
+        explosion.draw(arg0, arg1);
+        if (explosion.getCurrentFrame() == explosion.getLength() - 1)
+            FullThrottle.getGameManager().play();
     }
 
     @Override
@@ -297,13 +338,16 @@ public final class Road implements Drawable, Updatable {
         //     400, 0, 600, FullThrottle.WINDOW_HEIGHT
         // );
 
-        origin = Vector2f.sub(origin, new Vector2f(
-            speed * TimeManager.deltaTime(), 0
-        ));
+        float dX = speed * TimeManager.deltaTime();
+        
+        origin = Vector2f.sub(origin, new Vector2f(dX, 0));
 
         float tileWidth = ROAD_TILE_DIMENSIONS.x * ROAD_TILE_SCALE;
         while ((columns.size() - 1) * tileWidth < vBounds.width) {
             generateColumn();
+            if (rand.nextInt(3) == 1 && generateObstacles) {
+                generateObstacle(columns.size());
+            }
         }
 
         if (origin.x < vBounds.left - tileWidth) {
@@ -314,6 +358,26 @@ public final class Road implements Drawable, Updatable {
             );
             if (columns.size() != 0)
                 columns.remove(0);
+        }
+
+        for (ArrayList<Obstacle> l : obstacles.values()) {
+            ArrayList<Obstacle> offscreen = new ArrayList<>();
+            float currentX = Float.NEGATIVE_INFINITY;
+            for (Obstacle o : l) {
+                Vector2f newPos = o.move(dX);
+                if (newPos.x < currentX + (o.getSize().x / 2))
+                    o.setPosition(
+                        new Vector2f(
+                            currentX + (o.getSize().x / 2),
+                            newPos.y
+                        )
+                    );
+                currentX = newPos.x + o.getSize().x;
+
+                if (!o.isOnScreen())
+                    offscreen.add(o);
+            }
+            l.removeAll(offscreen);
         }
     }
 
@@ -353,7 +417,67 @@ public final class Road implements Drawable, Updatable {
     public void setRoadSection(RoadSection roadSection) {
         this.lastRoadSection = this.roadSection;
         this.roadSection = roadSection;
+        currentAllowedObstacles = ObstacleType.getObstaclesForSection(roadSection);
         generateTransitionColumns();
+    }
+    
+    public RoadSection getRoadSection() {
+        return roadSection;
+    }
+
+    public void setVisible(boolean b) {
+        this.bVisible = b;
+    }
+
+    public void generateObstacles(boolean b) {
+        this.generateObstacles = b;
+    }
+
+    public boolean isPlayerColliding(FloatRect playerBounds) {
+        ArrayList<Integer> playerLanes = new ArrayList<>();
+        for (int i = 0; i < lanes; i++) {
+            float top = getTopEdge() + (i * ROAD_TILE_DIMENSIONS.y * ROAD_TILE_SCALE);
+            float bottom = getTopEdge() + ((i + 1) * ROAD_TILE_DIMENSIONS.y * ROAD_TILE_SCALE);
+            if (playerBounds.top >= top && playerBounds.top <= bottom) {
+                playerLanes.add(i);
+                continue;
+            }
+            float pBottom = playerBounds.top + playerBounds.height;
+            if (pBottom >= top && pBottom <= bottom) {
+                playerLanes.add(i);
+                continue;
+            }
+
+            if (playerLanes.size() != 0)
+                if (i > playerLanes.get(playerLanes.size() - 1) + 1)
+                    break;
+        }
+        if (playerLanes.size() == 2 && playerLanes.get(0) + 1 != playerLanes.get(1))
+            playerLanes.add(1, playerLanes.get(0) + 1);
+
+        boolean collision = false;
+        Obstacle collider = null;
+        for (int i : playerLanes) {
+            for (Obstacle o : obstacles.get(i)) {
+                collision = o.intersects(playerBounds);
+                if (collision) {
+                    obstacles.get(i).remove(o);
+                    collider = o;
+                    break;
+                }
+            }
+            if (collision) break;
+        }
+
+        if (collision) {
+            float eX = collider.getPosition().x - (explosion.getGlobalBounds().width - collider.getSize().x) / 2;
+            float eY = collider.getPosition().y - (explosion.getGlobalBounds().height - collider.getSize().y);
+            explosion.setPosition(new Vector2f(eX, eY));
+            explosion.restart();
+            explosion.play();
+        }
+
+        return collision;
     }
 
     private class InvalidLaneCountException extends RuntimeException {

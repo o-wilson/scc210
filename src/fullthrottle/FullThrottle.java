@@ -3,6 +3,7 @@ package fullthrottle;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.Color;
@@ -24,16 +25,12 @@ import org.jsfml.window.VideoMode;
 import org.jsfml.window.WindowStyle;
 import org.jsfml.window.event.Event;
 
+import fullthrottle.Obstacle.ObstacleType;
 import fullthrottle.Road.RoadSection;
 import fullthrottle.gfx.FTTexture;
 import fullthrottle.gfx.ParallaxBackground;
 import fullthrottle.gfx.ParallaxBackground.Direction;
 import fullthrottle.gfx.Renderer;
-import fullthrottle.gfx.SpriteSequence;
-import fullthrottle.gfx.Spritesheet;
-import fullthrottle.sfx.FTMusic;
-import fullthrottle.shop.UpgradeMarker;
-import fullthrottle.shop.UpgradePath;
 import fullthrottle.ui.Button;
 import fullthrottle.ui.Button.ActionType;
 import fullthrottle.ui.ButtonManager;
@@ -67,6 +64,8 @@ public class FullThrottle {
     public LeaderBoard leaderBoard;
 
     // Gameplay
+    private static GameManager gameManager;
+
     public Road gameRoad;
     private ProgressBar fuelBar;
 
@@ -75,7 +74,9 @@ public class FullThrottle {
     // Road demo
 
     // Movement test
-    public Player pPlayer;
+    public Player player;
+
+    // Misc Testing
 
     public FullThrottle() {
         init();
@@ -85,6 +86,7 @@ public class FullThrottle {
         float titleW = title.getGlobalBounds().width;
         float titleH = title.getGlobalBounds().height;
         title.setPosition((WINDOW_WIDTH - titleW) / 2, (WINDOW_HEIGHT - titleH) / 2);
+        title.fadeIn(2);
 
         Vector2f loadingBarSize = new Vector2f(WINDOW_WIDTH + 100, 32);
         Vector2f loadingBarPos = new Vector2f(0, WINDOW_HEIGHT * (4 / 5f));
@@ -93,6 +95,7 @@ public class FullThrottle {
         loadingBar.lerpUpdate(false);
 
         for (int i = 120; i >= 0; i--) {
+            TimeManager.update();
             window.clear();
 
             float titleY = title.getGlobalBounds().top;
@@ -105,13 +108,13 @@ public class FullThrottle {
                 loadingBar.update();
             loadingBar.draw(window, new RenderStates(BlendMode.ALPHA));
 
-            VertexArray va = new VertexArray(PrimitiveType.QUADS);
-            Color fadeAmount = new Color(0, 0, 0, (255/120) * i);
-            va.add(new Vertex(Vector2f.ZERO, fadeAmount));
-            va.add(new Vertex(new Vector2f(WINDOW_WIDTH, 0), fadeAmount));
-            va.add(new Vertex(new Vector2f(WINDOW_WIDTH, WINDOW_HEIGHT), fadeAmount));
-            va.add(new Vertex(new Vector2f(0, WINDOW_HEIGHT), fadeAmount));
-            va.draw(window, new RenderStates(BlendMode.ALPHA));
+            // VertexArray va = new VertexArray(PrimitiveType.QUADS);
+            // Color fadeAmount = new Color(0, 0, 0, (255/120) * i);
+            // va.add(new Vertex(Vector2f.ZERO, fadeAmount));
+            // va.add(new Vertex(new Vector2f(WINDOW_WIDTH, 0), fadeAmount));
+            // va.add(new Vertex(new Vector2f(WINDOW_WIDTH, WINDOW_HEIGHT), fadeAmount));
+            // va.add(new Vertex(new Vector2f(0, WINDOW_HEIGHT), fadeAmount));
+            // va.draw(window, new RenderStates(BlendMode.ALPHA));
 
             window.display();
         }
@@ -141,16 +144,14 @@ public class FullThrottle {
         fpsCount.setColor(Color.RED);
         fpsCount.setPosition(1150, 10);
         double avgFps = 60;
+        window.setFramerateLimit(0);
 
         while (window.isOpen()) {
+            //cap fps to 60
+            if (TimeManager.elapsedTime() < 1/61f) continue;
             TimeManager.update();
 
-            /*
-             * first few frames are insanely fast and make the framerate seem unnaturally
-             * high, so we ignore them
-             */
-            if (TimeManager.deltaTime() >= 1f / 144)
-                avgFps = 0.9 * avgFps + (1 - 0.9) * (1 / TimeManager.deltaTime());
+            avgFps = 0.9 * avgFps + (1 - 0.9) * (1 / TimeManager.deltaTime());
 
             fpsCount.setString((int) avgFps + " FPS");
 
@@ -195,6 +196,7 @@ public class FullThrottle {
         window = new RenderWindow(new VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Full Throttle",
                 WindowStyle.TITLEBAR | WindowStyle.CLOSE);
         window.setKeyRepeatEnabled(false);
+        window.setFramerateLimit(120);
 
         Image icon = new Image();
         try {
@@ -235,29 +237,29 @@ public class FullThrottle {
         buttonManager.addObserver(highScoreButton);
 
         leaderBoard = new LeaderBoard();
-
+        leaderBoard.addCloseCallback(this, "hideLeaderBoard", ActionType.LEFT_CLICK);
 
 
         background = new ParallaxBackground(window, Direction.LEFT, 3000);
 
         Texture sky = new FTTexture("./res/BackgroundTest/Sky.png");
         Texture buildings = new FTTexture("./res/BackgroundTest/Buildings.png");
-        Texture road = new FTTexture("./res/BackgroundTest/Road.png");
-        Texture bush = new FTTexture("./res/BackgroundTest/Bush.png");
+        // Texture road = new FTTexture("./res/BackgroundTest/Road.png");
+        // Texture bush = new FTTexture("./res/BackgroundTest/Bush.png");
 
         Sprite skyS = new Sprite(sky);
         skyS.scale(2.8125f, 2.8125f);
         Sprite buildingsS = new Sprite(buildings);
         buildingsS.scale(2.8125f, 2.8125f);
-        Sprite roadS = new Sprite(road);
-        roadS.scale(2.8125f, 2.8125f);
-        Sprite bushS = new Sprite(bush);
-        bushS.scale(2.8125f, 2.8125f);
+        // Sprite roadS = new Sprite(road);
+        // roadS.scale(2.8125f, 2.8125f);
+        // Sprite bushS = new Sprite(bush);
+        // bushS.scale(2.8125f, 2.8125f);
 
         background.addElement(skyS, 30, Vector2f.ZERO);
         background.addElement(buildingsS, 15, Vector2f.ZERO);
-        background.addElement(roadS, 5, Vector2f.ZERO);
-        background.addElement(bushS, 5, new Vector2f(1000, 506.25f), 500);
+        // background.addElement(roadS, 5, Vector2f.ZERO);
+        // background.addElement(bushS, 5, new Vector2f(1000, 506.25f), 500);
         
         updatables.add(background);
 
@@ -265,7 +267,6 @@ public class FullThrottle {
 
         // Load game elements
         gameRoad = new Road(4, 320);
-        updatables.add(gameRoad);
         gameRoad.setSpeed(50);
 
         fuelBar = new ProgressBar(
@@ -275,7 +276,10 @@ public class FullThrottle {
         );
         updatables.add(fuelBar);
 
-        pPlayer = new Player();
+        player = new Player();
+
+        gameManager = new GameManager(gameRoad, player);
+        updatables.add(gameManager);
     }
 
     private void start() {
@@ -285,22 +289,25 @@ public class FullThrottle {
         title.setPosition(title.getGlobalBounds().left, 50);
         Renderer.addDrawable(title);
 
-        Renderer.addDrawable(settingsButton);
-        Renderer.addDrawable(playButton);
-        Renderer.addDrawable(highScoreButton);
+        Renderer.addDrawable(settingsButton, -50);
+        Renderer.addDrawable(playButton, -50);
+        Renderer.addDrawable(highScoreButton, -50);
         
         Renderer.addDrawable(background, 1000);
 
-        Renderer.addDrawable(leaderBoard);
+        Renderer.addDrawable(leaderBoard, -100);
         leaderBoard.setVisible(false);
         
+        Renderer.addDrawable(gameManager, -60);
 
-
-        // Renderer.addDrawable(gameRoad);
+        Renderer.addDrawable(gameRoad);
+        gameRoad.setVisible(true);
+        gameRoad.generateObstacles(false);
         Renderer.addDrawable(fuelBar);
         fuelBar.setVisible(false);
 
-        // Renderer.addDrawable(pPlayer, 0);
+        Renderer.addDrawable(player, 0);
+        player.setVisible(true);
     }
 
     private void update() {
@@ -315,32 +322,28 @@ public class FullThrottle {
         if (Input.getKeyDown(Key.NUM3))
             gameRoad.setRoadSection(RoadSection.DIRT);
 
-        if (Input.getKeyDown(Key.UP))
-            gameRoad.increaseSpeed(5);
-        else if (Input.getKeyDown(Key.DOWN))
-            gameRoad.increaseSpeed(-5);
-
         if (Input.getKeyDown(Key.LEFT))
             fuelBar.addToValue(-10);
         if (Input.getKeyDown(Key.RIGHT))
             fuelBar.addToValue(10);
             
-        Vector2f moveDirection = Vector2f.ZERO;
-        if (Input.getKey(Key.W))
-            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, -1));
-        else if (Input.getKey(Key.S))
-            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, 1));
-
-        if (Input.getKey(Key.A))
-            moveDirection = Vector2f.add(moveDirection, new Vector2f(-1, 0));
-        else if (Input.getKey(Key.D))
-            moveDirection = Vector2f.add(moveDirection, new Vector2f(1, 0));
-        pPlayer.move(moveDirection);
+        if (Input.getKeyDown(Key.P))
+            if (gameManager.isPaused())
+                gameManager.play();
+            else
+                gameManager.pause();
     }
 
     public static RenderWindow getWindow() {
         if (window != null)
             return window;
+
+        return null;
+    }
+
+    public static GameManager getGameManager() {
+        if (gameManager != null)
+            return gameManager;
 
         return null;
     }
@@ -368,12 +371,23 @@ public class FullThrottle {
         highScoreButton.setEnabled(false);
         settingsButton.setVisible(false);
         settingsButton.setEnabled(false);
-        title.setVisible(false);
+        title.fadeOut(.6f);
         leaderBoard.setVisible(false);
+        gameManager.startGame();
     }
 
     public void showLeaderBoard() {
+        playButton.setEnabled(false);
+        highScoreButton.setEnabled(false);
+        settingsButton.setEnabled(false);
         leaderBoard.setVisible(true);
+    }
+
+    public void hideLeaderBoard() {
+        leaderBoard.disableCloseButton();
+        playButton.setEnabled(true);
+        highScoreButton.setEnabled(true);
+        settingsButton.setEnabled(true);
     }
 
     public static void main(String[] args) {

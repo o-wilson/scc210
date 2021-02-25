@@ -1,51 +1,112 @@
 package fullthrottle;
 
-import fullthrottle.gfx.Spritesheet;
-import fullthrottle.gfx.FTTexture;
-import fullthrottle.gfx.SpriteSequence;
-import fullthrottle.gfx.Animation;
-
+import org.jsfml.graphics.Drawable;
+import org.jsfml.graphics.FloatRect;
+import org.jsfml.graphics.RenderStates;
+import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 
-import org.jsfml.graphics.RenderStates;
-import org.jsfml.graphics.RenderTarget;
-import org.jsfml.graphics.Sprite;
-import org.jsfml.graphics.Drawable;
-
+import fullthrottle.gfx.Animation;
+import fullthrottle.gfx.FTTexture;
+import fullthrottle.gfx.SpriteSequence;
+import fullthrottle.gfx.Spritesheet;
 import fullthrottle.util.TimeManager;
 
 public class Player implements Drawable {
-    private Vector2f vPosition;
-    //private Sprite sSprite;
+
+    private Vector2f position;
+
     private Animation carAnim;
-    private float moveSpeed;
-    private float moveSpeedNS;
-    private float moveSpeedEW;
-    public Player(){
-        vPosition = new Vector2f(40, 490);
+
+    private Vector2f moveSpeed;
+
+    private boolean bVisible;
+    private boolean active;
+
+    private FloatRect bounds;
+
+    private float scale;
+
+    public Player() {
+        this.scale = 2;
+
+        position = new Vector2f(40, 490);
+        bVisible = true;
         Spritesheet carSheet = new Spritesheet(
-            new  FTTexture("./res/AnimationTest.png"),
+            new FTTexture("./res/Car.png"),
             new Vector2i(32, 32)
         );
         //Sprite sSprite = carSheet.getSprite(0);
-        moveSpeed = 75;
-        moveSpeedEW = 75;
-        moveSpeedNS = 100;
+        moveSpeed = new Vector2f(120, 150);
+        // moveSpeedEW = 150;
+        // moveSpeedNS = 150;
         //sSprite.setScale(new Vector2f(2, 2));
 
         SpriteSequence carSeq = new SpriteSequence(carSheet);
         carAnim = new Animation(carSeq, 8, true);
-        carAnim.setScale(new Vector2f(2, 2));
-        //carAnim.setPosition(new Vector2f(900, 450));
+        carAnim.setScale(new Vector2f(scale, scale));
+        carAnim.setPosition(new Vector2f(900, 450));
+
+        bounds = new FloatRect(
+            1 * scale,
+            6 * scale,
+            30 * scale,
+            20 * scale
+        );
     }
+
     @Override
     public void draw(RenderTarget arg0, RenderStates arg1) {
-        carAnim.setPosition(vPosition);
+        if (!bVisible) return;
+        carAnim.setPosition(position);
         carAnim.draw(arg0, arg1);
     }
-    public void move(Vector2f moveDirection){
-        moveDirection = Vector2f.mul(moveDirection, moveSpeed * TimeManager.deltaTime());
-        vPosition = Vector2f.add(vPosition, moveDirection);
+
+    public void move(Vector2f moveDirection) {
+        if (!active) return;
+        
+        moveDirection = Vector2f.componentwiseMul(moveDirection, moveSpeed);
+        moveDirection = Vector2f.mul(moveDirection, TimeManager.deltaTime());
+        
+        position = Vector2f.add(position, moveDirection);
+    }
+
+    public void setVisible(boolean b) {
+        this.bVisible = b;
+    }
+    
+    public void setActive(boolean b) {
+        this.active = b;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setPosition(Vector2f position) {
+        this.position = position;
+    }
+
+    public Vector2f getPosition() {
+        return position;
+    }
+
+    public Vector2f getSize() {
+        Vector2f size = new Vector2f(
+            carAnim.getGlobalBounds().width,
+            carAnim.getGlobalBounds().height
+        );
+        return size;
+    }
+
+    public FloatRect getBounds() {
+        FloatRect globalBounds = new FloatRect(
+            bounds.left + position.x,
+            bounds.top + position.y,
+            bounds.width,
+            bounds.height
+        );
+        return globalBounds;
     }
 }
