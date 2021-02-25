@@ -21,7 +21,7 @@ public class Player implements Drawable {
     private Vector2f moveSpeed;
 
     private boolean bVisible;
-    private boolean bActive;
+    private boolean active;
 
     public Player() {
         position = new Vector2f(40, 490);
@@ -50,7 +50,7 @@ public class Player implements Drawable {
     }
 
     public void move(Vector2f moveDirection) {
-        if (!bActive) return;
+        if (!active) return;
         
         moveDirection = Vector2f.componentwiseMul(moveDirection, moveSpeed);
         moveDirection = Vector2f.mul(moveDirection, TimeManager.deltaTime());
@@ -63,7 +63,11 @@ public class Player implements Drawable {
     }
     
     public void setActive(boolean b) {
-        this.bActive = b;
+        this.active = b;
+    }
+
+    public boolean isActive() {
+        return active;
     }
 
     public void setPosition(Vector2f position) {

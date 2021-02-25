@@ -267,7 +267,6 @@ public class FullThrottle {
 
         // Load game elements
         gameRoad = new Road(4, 320);
-        updatables.add(gameRoad);
         gameRoad.setSpeed(50);
 
         fuelBar = new ProgressBar(
@@ -280,6 +279,7 @@ public class FullThrottle {
         player = new Player();
 
         gameManager = new GameManager(gameRoad, player);
+        updatables.add(gameManager);
     }
 
     private void start() {
@@ -332,7 +332,11 @@ public class FullThrottle {
         if (Input.getKeyDown(Key.RIGHT))
             fuelBar.addToValue(10);
             
-
+        if (Input.getKeyDown(Key.P))
+            if (gameManager.isPaused())
+                gameManager.play();
+            else
+                gameManager.pause();
         
         Vector2f moveDirection = Vector2f.ZERO;
     
@@ -378,13 +382,9 @@ public class FullThrottle {
         highScoreButton.setEnabled(false);
         settingsButton.setVisible(false);
         settingsButton.setEnabled(false);
-        // title.setVisible(false);
         title.fadeOut(.6f);
         leaderBoard.setVisible(false);
-        gameRoad.setVisible(true);
-        gameRoad.generateObstacles(true);
-        player.setVisible(true);
-        player.setActive(true);
+        gameManager.startGame();
     }
 
     public void showLeaderBoard() {
