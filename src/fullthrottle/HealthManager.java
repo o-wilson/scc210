@@ -81,8 +81,8 @@ public final class HealthManager implements Drawable {
     private ArrayList<Heart> hearts;
 
     public HealthManager(Vector2f position, float height) {
-        maxHealth = 5;
-        currentHealth = 5;
+        maxHealth = 1;
+        currentHealth = 1;
 
         this.position = position;
         this.width = 0;

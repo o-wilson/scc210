@@ -3,21 +3,17 @@ package fullthrottle;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Random;
 
 import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.Image;
-import org.jsfml.graphics.PrimitiveType;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderWindow;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Text;
 import org.jsfml.graphics.Texture;
-import org.jsfml.graphics.Vertex;
-import org.jsfml.graphics.VertexArray;
 import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 import org.jsfml.window.Keyboard.Key;
@@ -25,7 +21,6 @@ import org.jsfml.window.VideoMode;
 import org.jsfml.window.WindowStyle;
 import org.jsfml.window.event.Event;
 
-import fullthrottle.Obstacle.ObstacleType;
 import fullthrottle.Road.RoadSection;
 import fullthrottle.gfx.FTTexture;
 import fullthrottle.gfx.ParallaxBackground;
@@ -35,6 +30,7 @@ import fullthrottle.ui.Button;
 import fullthrottle.ui.Button.ActionType;
 import fullthrottle.ui.ButtonManager;
 import fullthrottle.ui.ProgressBar;
+import fullthrottle.ui.ReelInput;
 import fullthrottle.ui.UI;
 import fullthrottle.ui.UISprite;
 import fullthrottle.util.Input;
@@ -54,6 +50,8 @@ public class FullThrottle {
     private Text fpsCount;
     private boolean showFps = false;
 
+    private static GameManager gameManager;
+
     // Loading screen
     public ProgressBar loadingBar;
 
@@ -64,19 +62,16 @@ public class FullThrottle {
     public LeaderBoard leaderBoard;
 
     // Gameplay
-    private static GameManager gameManager;
-
-    public Road gameRoad;
-    private ProgressBar fuelBar;
+    public Player player;
+    public Road road;
+    public ProgressBar fuelBar;
 
     // Shop
+    
 
-    // Road demo
-
-    // Movement test
-    public Player player;
-
-    // Misc Testing
+    // Game Over
+    public UISprite gameOverText;
+    public ReelInput nameInput;
 
     public FullThrottle() {
         init();
@@ -107,14 +102,6 @@ public class FullThrottle {
             for (int u = 0; u < 100; u++)
                 loadingBar.update();
             loadingBar.draw(window, new RenderStates(BlendMode.ALPHA));
-
-            // VertexArray va = new VertexArray(PrimitiveType.QUADS);
-            // Color fadeAmount = new Color(0, 0, 0, (255/120) * i);
-            // va.add(new Vertex(Vector2f.ZERO, fadeAmount));
-            // va.add(new Vertex(new Vector2f(WINDOW_WIDTH, 0), fadeAmount));
-            // va.add(new Vertex(new Vector2f(WINDOW_WIDTH, WINDOW_HEIGHT), fadeAmount));
-            // va.add(new Vertex(new Vector2f(0, WINDOW_HEIGHT), fadeAmount));
-            // va.draw(window, new RenderStates(BlendMode.ALPHA));
 
             window.display();
         }
@@ -191,6 +178,10 @@ public class FullThrottle {
         }
     }
 
+    /**
+     * Initialisation of key utilities like
+     * Window, TimeManager, ButtonManager etc
+     */
     private void init() {
         // Initialisation
         window = new RenderWindow(new VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Full Throttle",
@@ -213,15 +204,17 @@ public class FullThrottle {
         TimeManager.update();
     }
 
+    /**
+     * Load images, create instances etc.
+     */
     private void load() {
-        // Load menu elements
+        // Menu
         Texture settingsT = new FTTexture("./res/Settings.png");
         Sprite settingsS = new Sprite(settingsT);
         settingsButton = new Button(
             new Vector2f(10, 10), new Vector2i(64, 64),
             settingsS, UI.SpriteFillMode.STRETCH
         );
-        // settingsButton.addAction(this, "settings", ActionType.LEFT_CLICK);
         buttonManager.addObserver(settingsButton);
         
         playButton = new PlayButton(
@@ -239,35 +232,26 @@ public class FullThrottle {
         leaderBoard = new LeaderBoard();
         leaderBoard.addCloseCallback(this, "hideLeaderBoard", ActionType.LEFT_CLICK);
 
-
         background = new ParallaxBackground(window, Direction.LEFT, 3000);
 
         Texture sky = new FTTexture("./res/BackgroundTest/Sky.png");
         Texture buildings = new FTTexture("./res/BackgroundTest/Buildings.png");
-        // Texture road = new FTTexture("./res/BackgroundTest/Road.png");
-        // Texture bush = new FTTexture("./res/BackgroundTest/Bush.png");
 
         Sprite skyS = new Sprite(sky);
         skyS.scale(2.8125f, 2.8125f);
         Sprite buildingsS = new Sprite(buildings);
         buildingsS.scale(2.8125f, 2.8125f);
-        // Sprite roadS = new Sprite(road);
-        // roadS.scale(2.8125f, 2.8125f);
-        // Sprite bushS = new Sprite(bush);
-        // bushS.scale(2.8125f, 2.8125f);
 
         background.addElement(skyS, 30, Vector2f.ZERO);
         background.addElement(buildingsS, 15, Vector2f.ZERO);
-        // background.addElement(roadS, 5, Vector2f.ZERO);
-        // background.addElement(bushS, 5, new Vector2f(1000, 506.25f), 500);
         
         updatables.add(background);
 
 
 
-        // Load game elements
-        gameRoad = new Road(4, 320);
-        gameRoad.setSpeed(50);
+        // Gameplay
+        road = new Road(4, 320);
+        road.setSpeed(50);
 
         fuelBar = new ProgressBar(
             new Vector2f(10, 10), new Vector2f(256, 64), 100,
@@ -278,36 +262,53 @@ public class FullThrottle {
 
         player = new Player();
 
-        gameManager = new GameManager(gameRoad, player);
-        updatables.add(gameManager);
+
+
+        // Upgrades
+
+
+
+
+        // Game Over
+        gameOverText = new UISprite(new FTTexture("./res/GameOver.png"));
+        gameOverText.setPosition(new Vector2f(
+            (WINDOW_WIDTH - gameOverText.getGlobalBounds().width) / 2,
+            50
+        ));
+
+        nameInput = new ReelInput(5, new Vector2f((WINDOW_WIDTH - 480) / 2, 320), new Vector2f(480, 192));
     }
 
+    /**
+     * Start the game
+     */
     private void start() {
         Renderer.clear();
 
-        // Add menu elements
+        // Menu
         title.setPosition(title.getGlobalBounds().left, 50);
         Renderer.addDrawable(title);
-
         Renderer.addDrawable(settingsButton, -50);
         Renderer.addDrawable(playButton, -50);
         Renderer.addDrawable(highScoreButton, -50);
-        
         Renderer.addDrawable(background, 1000);
-
         Renderer.addDrawable(leaderBoard, -100);
-        leaderBoard.setVisible(false);
-        
-        Renderer.addDrawable(gameManager, -60);
 
-        Renderer.addDrawable(gameRoad);
-        gameRoad.setVisible(true);
-        gameRoad.generateObstacles(false);
+        // Gameplay
+        Renderer.addDrawable(road);
         Renderer.addDrawable(fuelBar);
-        fuelBar.setVisible(false);
-
         Renderer.addDrawable(player, 0);
-        player.setVisible(true);
+
+        // Upgrades
+
+        // Game Over
+        Renderer.addDrawable(gameOverText);
+        Renderer.addDrawable(nameInput, -100);
+        
+        // Start the game manager
+        gameManager = new GameManager(this);
+        updatables.add(gameManager);
+        Renderer.addDrawable(gameManager, -60);
     }
 
     private void update() {
@@ -316,11 +317,11 @@ public class FullThrottle {
         }
 
         if (Input.getKeyDown(Key.NUM1))
-            gameRoad.setRoadSection(RoadSection.WHITE);
+            road.setRoadSection(RoadSection.WHITE);
         if (Input.getKeyDown(Key.NUM2))
-            gameRoad.setRoadSection(RoadSection.YELLOW);
+            road.setRoadSection(RoadSection.YELLOW);
         if (Input.getKeyDown(Key.NUM3))
-            gameRoad.setRoadSection(RoadSection.DIRT);
+            road.setRoadSection(RoadSection.DIRT);
 
         if (Input.getKeyDown(Key.LEFT))
             fuelBar.addToValue(-10);
@@ -364,15 +365,6 @@ public class FullThrottle {
     }
 
     public void startGame() {
-        fuelBar.setVisible(true);
-        playButton.setVisible(false);
-        playButton.setEnabled(false);
-        highScoreButton.setVisible(false);
-        highScoreButton.setEnabled(false);
-        settingsButton.setVisible(false);
-        settingsButton.setEnabled(false);
-        title.fadeOut(.6f);
-        leaderBoard.setVisible(false);
         gameManager.startGame();
     }
 
