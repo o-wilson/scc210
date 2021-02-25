@@ -20,18 +20,21 @@ import fullthrottle.util.Updatable;
 public final class GameManager implements Updatable, Drawable {
 
     private Road road;
-
     private Player player;
+    private HealthManager healthManager;
 
     private boolean started;
     private boolean paused;
     private float playingTime;
+
+    private float score;
 
     private Animation healthAlertAnim;
 
     public GameManager(Road road, Player player) {
         this.road = road;
         this.player = player;
+        healthManager = new HealthManager(new Vector2f(288, 10), 64);
 
         this.paused = false;
 
@@ -51,6 +54,8 @@ public final class GameManager implements Updatable, Drawable {
         healthAlertAnim.setPosition(Vector2f.ZERO);
         healthAlertAnim.pause();
         healthAlertAnim.restart();
+
+        this.score = 0;
     }
 
     public void movePlayer(Vector2f moveDirection) {
@@ -97,16 +102,25 @@ public final class GameManager implements Updatable, Drawable {
                     movePlayer(moveDirection);
                 }
 
+                if (Input.getKeyDown(Key.H))
+                    healthManager.addHealth();
+                if (Input.getKeyDown(Key.Y))
+                    healthManager.addMaxHealth();
+
                 if (road.isPlayerColliding(player.getBounds())) {
                     pause();
                     healthAlertAnim.restart();
                     healthAlertAnim.play();
+                    int health = healthManager.removeHealth();
+                    if (health == 0) {
+                        // TODO: game over
+                    }
                 }
+
+                score += road.getSpeed() * road.getSpeed() * TimeManager.deltaTime() / 10000f;
             }
             road.setSpeed(roadSpeedFunction(playingTime));
         }
-
-        System.out.println(healthAlertAnim.getCurrentFrame());
     }
 
     public void startGame() {
@@ -136,6 +150,8 @@ public final class GameManager implements Updatable, Drawable {
 
     @Override
     public void draw(RenderTarget arg0, RenderStates arg1) {
+        if (!started) return;
+        healthManager.draw(arg0, arg1);
         healthAlertAnim.draw(arg0, arg1);
     }
 }
