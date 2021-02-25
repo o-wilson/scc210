@@ -1,6 +1,7 @@
 package fullthrottle;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 import org.jsfml.graphics.Drawable;
@@ -68,7 +69,7 @@ public final class Road implements Drawable, Updatable {
 
     private Vector2f origin;
 
-    private ArrayList<Obstacle> obstacles;
+    private HashMap<Integer, ArrayList<Obstacle>> obstacles;
 
     private ArrayList<ObstacleType> currentAllowedObstacles;
 
@@ -153,7 +154,10 @@ public final class Road implements Drawable, Updatable {
         );
 
         columns = new ArrayList<>();
-        obstacles = new ArrayList<>();
+        obstacles = new HashMap<>();
+        for (int i = 0; i < lanes; i++) {
+            obstacles.put(i, new ArrayList<Obstacle>());
+        }
         currentAllowedObstacles = ObstacleType.getObstaclesForSection(rS);
     }
 
@@ -253,8 +257,9 @@ public final class Road implements Drawable, Updatable {
         ObstacleType type = currentAllowedObstacles.get(rand.nextInt(currentAllowedObstacles.size()));
 
         float scaleFactor = (ROAD_TILE_SCALE * ROAD_TILE_DIMENSIONS.y) / Obstacle.OBSTACLE_SPRITE_SIZE.y;
-        Obstacle o = new Obstacle(type, new Vector2f(column * ROAD_TILE_DIMENSIONS.x * ROAD_TILE_SCALE, getLanePos(rand.nextInt(lanes))), scaleFactor);
-        obstacles.add(o);
+        int lane = rand.nextInt(lanes);
+        Obstacle o = new Obstacle(type, new Vector2f(column * ROAD_TILE_DIMENSIONS.x * ROAD_TILE_SCALE, getLanePos(lane)), scaleFactor);
+        obstacles.get(lane).add(o);
     }
 
     @Override
@@ -302,8 +307,10 @@ public final class Road implements Drawable, Updatable {
         // System.out.println("Start obst draw");
         VertexArray obVA = new VertexArray(PrimitiveType.QUADS);
         RenderStates obRS = new RenderStates(arg1, Obstacle.OBSTACLE_SPRITE_SHEET);
-        for (Obstacle o : obstacles) {
-            obVA.addAll(o.getVertexArray());
+        for (ArrayList<Obstacle> l : obstacles.values()) {
+            for (Obstacle o : l) {
+                obVA.addAll(o.getVertexArray());
+            }
         }
         obVA.draw(arg0, obRS);
     }
@@ -341,12 +348,20 @@ public final class Road implements Drawable, Updatable {
                 columns.remove(0);
         }
 
-        ArrayList<Obstacle> offscreenObstacles = new ArrayList<>();
-        for (Obstacle o : obstacles) {
-            if (!o.move(dX))
-                offscreenObstacles.add(o);
+        for (ArrayList<Obstacle> l : obstacles.values()) {
+            ArrayList<Obstacle> offscreenObstacles = new ArrayList<>();
+            float currentX = Float.NEGATIVE_INFINITY;
+            for (Obstacle o : l) {
+                Vector2f newPos = o.move(dX);
+                if (newPos.x < currentX + (o.getSize().x / 2))
+                    o.setPosition(new Vector2f(currentX + (o.getSize().x / 2), newPos.y));
+                currentX = newPos.x + o.getSize().x;
+
+                if (!o.isOnScreen())
+                    offscreenObstacles.add(o);
+            }
+            l.removeAll(offscreenObstacles);
         }
-        obstacles.removeAll(offscreenObstacles);
     }
 
     /**

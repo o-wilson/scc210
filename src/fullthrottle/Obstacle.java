@@ -92,11 +92,28 @@ public class Obstacle {
         this.scale = scale;
     }
     
-    public boolean move(float dXPos) {
+    public Vector2f move(float dXPos) {
         dXPos += type.moveSpeed * TimeManager.deltaTime();
         position = Vector2f.sub(position, new Vector2f(dXPos, 0));
         
-        return position.x + (OBSTACLE_SPRITE_SIZE.x * scale) > 0;
+        // return position.x + (OBSTACLE_SPRITE_SIZE.x * scale) > 0;
+        return position;
+    }
+
+    public Vector2f getPosition() {
+        return position;
+    }
+
+    public void setPosition(Vector2f position) {
+        this.position = position;
+    }
+
+    public Vector2f getSize() {
+        return Vector2f.mul(OBSTACLE_SPRITE_SIZE, scale);
+    }
+
+    public boolean isOnScreen() {
+        return getPosition().x + getSize().x > 0;
     }
 
     public VertexArray getVertexArray() {
