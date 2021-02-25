@@ -64,7 +64,7 @@ public class FullThrottle {
     public LeaderBoard leaderBoard;
 
     // Gameplay
-    private GameManager gameManager;
+    private static GameManager gameManager;
 
     public Road gameRoad;
     private ProgressBar fuelBar;
@@ -298,7 +298,7 @@ public class FullThrottle {
         Renderer.addDrawable(leaderBoard, -100);
         leaderBoard.setVisible(false);
         
-
+        Renderer.addDrawable(gameManager, -60);
 
         Renderer.addDrawable(gameRoad);
         gameRoad.setVisible(true);
@@ -322,11 +322,6 @@ public class FullThrottle {
         if (Input.getKeyDown(Key.NUM3))
             gameRoad.setRoadSection(RoadSection.DIRT);
 
-        if (Input.getKeyDown(Key.UP))
-            gameRoad.increaseSpeed(5);
-        else if (Input.getKeyDown(Key.DOWN))
-            gameRoad.increaseSpeed(-5);
-
         if (Input.getKeyDown(Key.LEFT))
             fuelBar.addToValue(-10);
         if (Input.getKeyDown(Key.RIGHT))
@@ -337,24 +332,18 @@ public class FullThrottle {
                 gameManager.play();
             else
                 gameManager.pause();
-        
-        Vector2f moveDirection = Vector2f.ZERO;
-    
-        if (Input.getKey(Key.A))
-            moveDirection = Vector2f.add(moveDirection, new Vector2f(-1, 0));
-        else if (Input.getKey(Key.D))
-            moveDirection = Vector2f.add(moveDirection, new Vector2f(1, 0));
-        if (Input.getKey(Key.W))
-            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, -1));
-        else if (Input.getKey(Key.S))
-            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, 1));
-
-        gameManager.movePlayer(moveDirection);
     }
 
     public static RenderWindow getWindow() {
         if (window != null)
             return window;
+
+        return null;
+    }
+
+    public static GameManager getGameManager() {
+        if (gameManager != null)
+            return gameManager;
 
         return null;
     }

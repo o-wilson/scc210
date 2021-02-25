@@ -16,6 +16,7 @@ import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 
 import fullthrottle.Obstacle.ObstacleType;
+import fullthrottle.gfx.Animation;
 import fullthrottle.gfx.FTTexture;
 import fullthrottle.util.TimeManager;
 import fullthrottle.util.Updatable;
@@ -70,6 +71,8 @@ public final class Road implements Drawable, Updatable {
     private Vector2f origin;
 
     private HashMap<Integer, ArrayList<Obstacle>> obstacles;
+
+    private Animation explosion;
 
     private ArrayList<ObstacleType> currentAllowedObstacles;
 
@@ -159,6 +162,11 @@ public final class Road implements Drawable, Updatable {
             obstacles.put(i, new ArrayList<Obstacle>());
         }
         currentAllowedObstacles = ObstacleType.getObstaclesForSection(rS);
+
+        explosion = new Animation(Obstacle.OBSTACLE_EXPLOSION_SEQUENCE, 16, false);
+        explosion.scale(new Vector2f(ROAD_TILE_SCALE, ROAD_TILE_SCALE));
+        explosion.restart();
+        explosion.pause();
     }
 
     public float getTopEdge() {
@@ -313,6 +321,10 @@ public final class Road implements Drawable, Updatable {
             }
         }
         obVA.draw(arg0, obRS);
+
+        explosion.draw(arg0, arg1);
+        if (explosion.getCurrentFrame() == explosion.getLength() - 1)
+            FullThrottle.getGameManager().play();
     }
 
     @Override
@@ -419,6 +431,53 @@ public final class Road implements Drawable, Updatable {
 
     public void generateObstacles(boolean b) {
         this.generateObstacles = b;
+    }
+
+    public boolean isPlayerColliding(FloatRect playerBounds) {
+        ArrayList<Integer> playerLanes = new ArrayList<>();
+        for (int i = 0; i < lanes; i++) {
+            float top = getTopEdge() + (i * ROAD_TILE_DIMENSIONS.y * ROAD_TILE_SCALE);
+            float bottom = getTopEdge() + ((i + 1) * ROAD_TILE_DIMENSIONS.y * ROAD_TILE_SCALE);
+            if (playerBounds.top >= top && playerBounds.top <= bottom) {
+                playerLanes.add(i);
+                continue;
+            }
+            float pBottom = playerBounds.top + playerBounds.height;
+            if (pBottom >= top && pBottom <= bottom) {
+                playerLanes.add(i);
+                continue;
+            }
+
+            if (playerLanes.size() != 0)
+                if (i > playerLanes.get(playerLanes.size() - 1) + 1)
+                    break;
+        }
+        if (playerLanes.size() == 2 && playerLanes.get(0) + 1 != playerLanes.get(1))
+            playerLanes.add(1, playerLanes.get(0) + 1);
+
+        boolean collision = false;
+        Obstacle collider = null;
+        for (int i : playerLanes) {
+            for (Obstacle o : obstacles.get(i)) {
+                collision = o.intersects(playerBounds);
+                if (collision) {
+                    obstacles.get(i).remove(o);
+                    collider = o;
+                    break;
+                }
+            }
+            if (collision) break;
+        }
+
+        if (collision) {
+            float eX = collider.getPosition().x - (explosion.getGlobalBounds().width - collider.getSize().x) / 2;
+            float eY = collider.getPosition().y - (explosion.getGlobalBounds().height - collider.getSize().y);
+            explosion.setPosition(new Vector2f(eX, eY));
+            explosion.restart();
+            explosion.play();
+        }
+
+        return collision;
     }
 
     private class InvalidLaneCountException extends RuntimeException {

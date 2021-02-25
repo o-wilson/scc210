@@ -1,6 +1,7 @@
 package fullthrottle;
 
 import org.jsfml.graphics.Drawable;
+import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
@@ -23,7 +24,13 @@ public class Player implements Drawable {
     private boolean bVisible;
     private boolean active;
 
+    private FloatRect bounds;
+
+    private float scale;
+
     public Player() {
+        this.scale = 2;
+
         position = new Vector2f(40, 490);
         bVisible = true;
         Spritesheet carSheet = new Spritesheet(
@@ -38,8 +45,15 @@ public class Player implements Drawable {
 
         SpriteSequence carSeq = new SpriteSequence(carSheet);
         carAnim = new Animation(carSeq, 8, true);
-        carAnim.setScale(new Vector2f(2, 2));
+        carAnim.setScale(new Vector2f(scale, scale));
         carAnim.setPosition(new Vector2f(900, 450));
+
+        bounds = new FloatRect(
+            1 * scale,
+            6 * scale,
+            30 * scale,
+            20 * scale
+        );
     }
 
     @Override
@@ -84,5 +98,15 @@ public class Player implements Drawable {
             carAnim.getGlobalBounds().height
         );
         return size;
+    }
+
+    public FloatRect getBounds() {
+        FloatRect globalBounds = new FloatRect(
+            bounds.left + position.x,
+            bounds.top + position.y,
+            bounds.width,
+            bounds.height
+        );
+        return globalBounds;
     }
 }
