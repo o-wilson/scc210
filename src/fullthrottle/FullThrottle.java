@@ -75,7 +75,6 @@ public class FullThrottle {
     public Player pPlayer;
 
     // Misc Testing
-    public Obstacle o;
 
     public FullThrottle() {
         init();
@@ -141,16 +140,14 @@ public class FullThrottle {
         fpsCount.setColor(Color.RED);
         fpsCount.setPosition(1150, 10);
         double avgFps = 60;
+        window.setFramerateLimit(0);
 
         while (window.isOpen()) {
+            //cap fps to 60
+            if (TimeManager.elapsedTime() < 1/61f) continue;
             TimeManager.update();
 
-            /*
-             * first few frames are insanely fast and make the framerate seem unnaturally
-             * high, so we ignore them
-             */
-            if (TimeManager.deltaTime() >= 1f / 144)
-                avgFps = 0.9 * avgFps + (1 - 0.9) * (1 / TimeManager.deltaTime());
+            avgFps = 0.9 * avgFps + (1 - 0.9) * (1 / TimeManager.deltaTime());
 
             fpsCount.setString((int) avgFps + " FPS");
 
@@ -195,6 +192,7 @@ public class FullThrottle {
         window = new RenderWindow(new VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Full Throttle",
                 WindowStyle.TITLEBAR | WindowStyle.CLOSE);
         window.setKeyRepeatEnabled(false);
+        window.setFramerateLimit(120);
 
         Image icon = new Image();
         try {
@@ -297,19 +295,16 @@ public class FullThrottle {
 
 
         Renderer.addDrawable(gameRoad);
-        gameRoad.setVisible(false);
+        gameRoad.setVisible(true);
+        gameRoad.generateObstacles(false);
         Renderer.addDrawable(fuelBar);
         fuelBar.setVisible(false);
 
         Renderer.addDrawable(pPlayer, 0);
         pPlayer.setVisible(true);
-
-        Renderer.addDrawable(gameRoad);
-        gameRoad.setVisible(true);
     }
 
     private void update() {
-
         for (Updatable u : updatables) {
             u.update();
         }
@@ -380,6 +375,7 @@ public class FullThrottle {
         title.setVisible(false);
         leaderBoard.setVisible(false);
         gameRoad.setVisible(true);
+        gameRoad.generateObstacles(true);
         pPlayer.setVisible(true);
         pPlayer.setActive(true);
     }

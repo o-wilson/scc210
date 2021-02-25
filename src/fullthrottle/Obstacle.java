@@ -46,7 +46,10 @@ public class Obstacle {
         public final FloatRect hitBox;
         public final RoadSection[] sections;
 
-        private ObstacleType(int i, int f, int fps, float s, FloatRect b, RoadSection[] sections) {
+        private ObstacleType(
+            int i, int f, int fps, float s,
+            FloatRect b, RoadSection[] sections
+        ) {
             this.obstacleIndex = i;
             this.frames = f;
             this.fps = fps;
@@ -103,7 +106,7 @@ public class Obstacle {
         );
         if (frameCount != 1) {
             currentTimeToNextFrame -= TimeManager.deltaTime();
-            while (currentTimeToNextFrame <= 0) {
+            if (currentTimeToNextFrame <= 0) {
                 currentFrame++;
                 currentTimeToNextFrame += timeToNextFrame;
             }

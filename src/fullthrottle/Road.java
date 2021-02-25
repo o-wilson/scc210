@@ -25,7 +25,8 @@ import fullthrottle.util.Updatable;
  * only one should be needed
  */
 public final class Road implements Drawable, Updatable {
-    private boolean bVisible = true;
+    private boolean bVisible;
+    private boolean generateObstacles;
     /**
      * Dimensions of each tile in the spritesheet
      */
@@ -298,12 +299,12 @@ public final class Road implements Drawable, Updatable {
         RenderStates rs = new RenderStates(arg1, ROAD_TEXTURE);
         //Draw VertexArray
         va.draw(arg0, rs);
-
+        // System.out.println("Start obst draw");
         VertexArray obVA = new VertexArray(PrimitiveType.QUADS);
+        RenderStates obRS = new RenderStates(arg1, Obstacle.OBSTACLE_SPRITE_SHEET);
         for (Obstacle o : obstacles) {
             obVA.addAll(o.getVertexArray());
         }
-        RenderStates obRS = new RenderStates(arg1, Obstacle.OBSTACLE_SPRITE_SHEET);
         obVA.draw(arg0, obRS);
     }
 
@@ -325,7 +326,7 @@ public final class Road implements Drawable, Updatable {
         float tileWidth = ROAD_TILE_DIMENSIONS.x * ROAD_TILE_SCALE;
         while ((columns.size() - 1) * tileWidth < vBounds.width) {
             generateColumn();
-            if (rand.nextInt(3) == 1) {
+            if (rand.nextInt(3) == 1 && generateObstacles) {
                 generateObstacle(columns.size());
             }
         }
@@ -394,6 +395,10 @@ public final class Road implements Drawable, Updatable {
 
     public void setVisible(boolean b) {
         this.bVisible = b;
+    }
+
+    public void generateObstacles(boolean b) {
+        this.generateObstacles = b;
     }
 
     private class InvalidLaneCountException extends RuntimeException {
