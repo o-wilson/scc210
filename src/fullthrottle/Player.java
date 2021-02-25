@@ -14,7 +14,7 @@ import fullthrottle.util.TimeManager;
 
 public class Player implements Drawable {
 
-    private Vector2f vPosition;
+    private Vector2f position;
 
     private Animation carAnim;
 
@@ -24,7 +24,7 @@ public class Player implements Drawable {
     private boolean bActive;
 
     public Player() {
-        vPosition = new Vector2f(40, 490);
+        position = new Vector2f(40, 490);
         bVisible = true;
         Spritesheet carSheet = new Spritesheet(
             new FTTexture("./res/Car.png"),
@@ -45,7 +45,7 @@ public class Player implements Drawable {
     @Override
     public void draw(RenderTarget arg0, RenderStates arg1) {
         if (!bVisible) return;
-        carAnim.setPosition(vPosition);
+        carAnim.setPosition(position);
         carAnim.draw(arg0, arg1);
     }
 
@@ -55,7 +55,7 @@ public class Player implements Drawable {
         moveDirection = Vector2f.componentwiseMul(moveDirection, moveSpeed);
         moveDirection = Vector2f.mul(moveDirection, TimeManager.deltaTime());
         
-        vPosition = Vector2f.add(vPosition, moveDirection);
+        position = Vector2f.add(position, moveDirection);
     }
 
     public void setVisible(boolean b) {
@@ -64,5 +64,21 @@ public class Player implements Drawable {
     
     public void setActive(boolean b) {
         this.bActive = b;
+    }
+
+    public void setPosition(Vector2f position) {
+        this.position = position;
+    }
+
+    public Vector2f getPosition() {
+        return position;
+    }
+
+    public Vector2f getSize() {
+        Vector2f size = new Vector2f(
+            carAnim.getGlobalBounds().width,
+            carAnim.getGlobalBounds().height
+        );
+        return size;
     }
 }

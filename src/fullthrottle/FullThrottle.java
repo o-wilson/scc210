@@ -64,6 +64,8 @@ public class FullThrottle {
     public LeaderBoard leaderBoard;
 
     // Gameplay
+    private GameManager gameManager;
+
     public Road gameRoad;
     private ProgressBar fuelBar;
 
@@ -72,7 +74,7 @@ public class FullThrottle {
     // Road demo
 
     // Movement test
-    public Player pPlayer;
+    public Player player;
 
     // Misc Testing
 
@@ -275,7 +277,9 @@ public class FullThrottle {
         );
         updatables.add(fuelBar);
 
-        pPlayer = new Player();
+        player = new Player();
+
+        gameManager = new GameManager(gameRoad, player);
     }
 
     private void start() {
@@ -302,8 +306,8 @@ public class FullThrottle {
         Renderer.addDrawable(fuelBar);
         fuelBar.setVisible(false);
 
-        Renderer.addDrawable(pPlayer, 0);
-        pPlayer.setVisible(true);
+        Renderer.addDrawable(player, 0);
+        player.setVisible(true);
     }
 
     private void update() {
@@ -341,7 +345,7 @@ public class FullThrottle {
         else if (Input.getKey(Key.S))
             moveDirection = Vector2f.add(moveDirection, new Vector2f(0, 1));
 
-        pPlayer.move(moveDirection);
+        gameManager.movePlayer(moveDirection);
     }
 
     public static RenderWindow getWindow() {
@@ -379,8 +383,8 @@ public class FullThrottle {
         leaderBoard.setVisible(false);
         gameRoad.setVisible(true);
         gameRoad.generateObstacles(true);
-        pPlayer.setVisible(true);
-        pPlayer.setActive(true);
+        player.setVisible(true);
+        player.setActive(true);
     }
 
     public void showLeaderBoard() {
