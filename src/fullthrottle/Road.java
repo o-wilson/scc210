@@ -349,18 +349,23 @@ public final class Road implements Drawable, Updatable {
         }
 
         for (ArrayList<Obstacle> l : obstacles.values()) {
-            ArrayList<Obstacle> offscreenObstacles = new ArrayList<>();
+            ArrayList<Obstacle> offscreen = new ArrayList<>();
             float currentX = Float.NEGATIVE_INFINITY;
             for (Obstacle o : l) {
                 Vector2f newPos = o.move(dX);
                 if (newPos.x < currentX + (o.getSize().x / 2))
-                    o.setPosition(new Vector2f(currentX + (o.getSize().x / 2), newPos.y));
+                    o.setPosition(
+                        new Vector2f(
+                            currentX + (o.getSize().x / 2),
+                            newPos.y
+                        )
+                    );
                 currentX = newPos.x + o.getSize().x;
 
                 if (!o.isOnScreen())
-                    offscreenObstacles.add(o);
+                    offscreen.add(o);
             }
-            l.removeAll(offscreenObstacles);
+            l.removeAll(offscreen);
         }
     }
 

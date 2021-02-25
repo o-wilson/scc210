@@ -115,13 +115,22 @@ public final class LeaderBoard extends UISprite {
         }
     }
 
+    public void addCloseCallback(Object o, String m, ActionType t) {
+        closeButton.addAction(o, m, t);
+    }
+
+    public void disableCloseButton() {
+        closeButton.setEnabled(false);
+    }
+
     @Override
     public void setVisible(boolean visible) {
         super.setVisible(visible);
         closeButton.setVisible(visible);
-        closeButton.setEnabled(visible);
-        if (visible)
+        if (visible) {
+            closeButton.setEnabled(true);
             loadScores();
+        }
     }
 
     @Override

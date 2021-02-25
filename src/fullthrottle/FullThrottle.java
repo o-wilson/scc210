@@ -84,6 +84,7 @@ public class FullThrottle {
         float titleW = title.getGlobalBounds().width;
         float titleH = title.getGlobalBounds().height;
         title.setPosition((WINDOW_WIDTH - titleW) / 2, (WINDOW_HEIGHT - titleH) / 2);
+        title.fadeIn(2);
 
         Vector2f loadingBarSize = new Vector2f(WINDOW_WIDTH + 100, 32);
         Vector2f loadingBarPos = new Vector2f(0, WINDOW_HEIGHT * (4 / 5f));
@@ -92,6 +93,7 @@ public class FullThrottle {
         loadingBar.lerpUpdate(false);
 
         for (int i = 120; i >= 0; i--) {
+            TimeManager.update();
             window.clear();
 
             float titleY = title.getGlobalBounds().top;
@@ -104,13 +106,13 @@ public class FullThrottle {
                 loadingBar.update();
             loadingBar.draw(window, new RenderStates(BlendMode.ALPHA));
 
-            VertexArray va = new VertexArray(PrimitiveType.QUADS);
-            Color fadeAmount = new Color(0, 0, 0, (255/120) * i);
-            va.add(new Vertex(Vector2f.ZERO, fadeAmount));
-            va.add(new Vertex(new Vector2f(WINDOW_WIDTH, 0), fadeAmount));
-            va.add(new Vertex(new Vector2f(WINDOW_WIDTH, WINDOW_HEIGHT), fadeAmount));
-            va.add(new Vertex(new Vector2f(0, WINDOW_HEIGHT), fadeAmount));
-            va.draw(window, new RenderStates(BlendMode.ALPHA));
+            // VertexArray va = new VertexArray(PrimitiveType.QUADS);
+            // Color fadeAmount = new Color(0, 0, 0, (255/120) * i);
+            // va.add(new Vertex(Vector2f.ZERO, fadeAmount));
+            // va.add(new Vertex(new Vector2f(WINDOW_WIDTH, 0), fadeAmount));
+            // va.add(new Vertex(new Vector2f(WINDOW_WIDTH, WINDOW_HEIGHT), fadeAmount));
+            // va.add(new Vertex(new Vector2f(0, WINDOW_HEIGHT), fadeAmount));
+            // va.draw(window, new RenderStates(BlendMode.ALPHA));
 
             window.display();
         }
@@ -233,7 +235,7 @@ public class FullThrottle {
         buttonManager.addObserver(highScoreButton);
 
         leaderBoard = new LeaderBoard();
-
+        leaderBoard.addCloseCallback(this, "hideLeaderBoard", ActionType.LEFT_CLICK);
 
 
         background = new ParallaxBackground(window, Direction.LEFT, 3000);
@@ -289,7 +291,7 @@ public class FullThrottle {
         
         Renderer.addDrawable(background, 1000);
 
-        Renderer.addDrawable(leaderBoard);
+        Renderer.addDrawable(leaderBoard, -100);
         leaderBoard.setVisible(false);
         
 
@@ -372,7 +374,8 @@ public class FullThrottle {
         highScoreButton.setEnabled(false);
         settingsButton.setVisible(false);
         settingsButton.setEnabled(false);
-        title.setVisible(false);
+        // title.setVisible(false);
+        title.fadeOut(.6f);
         leaderBoard.setVisible(false);
         gameRoad.setVisible(true);
         gameRoad.generateObstacles(true);
@@ -381,7 +384,17 @@ public class FullThrottle {
     }
 
     public void showLeaderBoard() {
+        playButton.setEnabled(false);
+        highScoreButton.setEnabled(false);
+        settingsButton.setEnabled(false);
         leaderBoard.setVisible(true);
+    }
+
+    public void hideLeaderBoard() {
+        leaderBoard.disableCloseButton();
+        playButton.setEnabled(true);
+        highScoreButton.setEnabled(true);
+        settingsButton.setEnabled(true);
     }
 
     public static void main(String[] args) {
