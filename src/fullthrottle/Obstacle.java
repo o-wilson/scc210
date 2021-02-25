@@ -42,7 +42,24 @@ public class Obstacle {
         CAR_8(7, 2, 8, 90, new FloatRect(1, 10, 30, 14), new RoadSection[] {RoadSection.WHITE}),
         CAR_9(8, 2, 10, 110, new FloatRect(1, 10, 30, 13), new RoadSection[] {RoadSection.WHITE}),
         CAR_10(9, 2, 13, 140, new FloatRect(1, 12, 30, 10), new RoadSection[] {RoadSection.YELLOW, RoadSection.WHITE, RoadSection.DIRT}),
-        CAR_11(10, 2, 13, 180, new FloatRect(1, 12, 30, 11), new RoadSection[] {RoadSection.YELLOW, RoadSection.WHITE, RoadSection.DIRT})
+        CAR_11(10, 2, 13, 180, new FloatRect(1, 12, 30, 11), new RoadSection[] {RoadSection.YELLOW, RoadSection.WHITE, RoadSection.DIRT}),
+        DOG_1(11, 4, 5, 0, new FloatRect(0, 0, 32, 32), new RoadSection[] {}),
+        DOG_2(12, 2, 5, 0, new FloatRect(0, 0, 32, 32), new RoadSection[] {}),
+        CAT(13, 2, 5, 0, new FloatRect(0, 0, 32, 32), new RoadSection[] {}),
+        PIG(14, 2, 8, 0, new FloatRect(0, 0, 32, 32), new RoadSection[] {}),
+        CONE(15, 1, 1, 0, new FloatRect(0, 0, 32, 32), new RoadSection[] {}),
+        BARRIER(16, 2, 10, 0, new FloatRect(0, 0, 32, 32), new RoadSection[] {}),
+        SIGN_1(17, 1, 1, 0, new FloatRect(0, 0, 32, 32), new RoadSection[] {}),
+        SIGN_2(18, 1, 1, 0, new FloatRect(0, 0, 32, 32), new RoadSection[] {}),
+        ROCK_1(19, 1, 1, 0, new FloatRect(0, 0, 32, 32), new RoadSection[] {}),
+        ROCK_2(20, 1, 1, 0, new FloatRect(0, 0, 32, 32), new RoadSection[] {}),
+        TREE_1(21, 4, 5, 0, new FloatRect(0, 0, 32, 32), new RoadSection[] {}),
+        TREE_2(22, 4, 7, 0, new FloatRect(0, 0, 32, 32), new RoadSection[] {}),
+        TREE_3(23, 4, 10, 0, new FloatRect(0, 0, 32, 32), new RoadSection[] {}),
+        TRUCK_1(11, 2, 7, 60, new FloatRect(0, 0, 32, 32), new RoadSection[] {}),
+        TRUCK_2(11, 2, 7, 60, new FloatRect(0, 0, 32, 32), new RoadSection[] {}),
+        TRUCK_3(11, 4, 7, 60, new FloatRect(0, 0, 32, 32), new RoadSection[] {}),
+        TRUCK_4(11, 2, 7, 60, new FloatRect(0, 0, 32, 32), new RoadSection[] {}),
         ;
         
         public final int obstacleIndex;

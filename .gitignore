@@ -1,5 +1,6 @@
 # ---> Java
 *.class
+*.jar
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
@@ -17,3 +18,8 @@ javadoc
 sources.txt
 out
 .highscores
+.vscode
+.gitignore
+res/aseprite
+*.aseprite
+res/IndividualObstacles
