@@ -148,7 +148,7 @@ public final class GameManager implements Updatable, Drawable {
                 if (player.isActive()) {
                     Vector2f moveDirection = Vector2f.ZERO;
 
-                    if (Input.getKey(Key.LSHIFT) && player.getShifted() == false){
+                    if (Input.getKey(Key.SPACE) && player.getShifted() == false){
                         player.setSlam(true);
                         if (Input.getKey(Key.A))
                             moveDirection = Vector2f.add(moveDirection, new Vector2f(-20, 0));

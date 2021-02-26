@@ -8,7 +8,7 @@ To control the player use a keyboard:
     A to go left
     S to go down
     D to go right
-    Left shift to use the slam move
+    Space to use the slam move
 
 The goal of the game is to avoid obstacles for as long as possible. You do this by moving your 
 player car around the road to avoid the obstacles.
@@ -18,3 +18,5 @@ during its duration without you taking damage.
 
 You have 5 health. You lose health by running into obstacles. When you run out of health, the game
 is over.
+
+Fuel goes down over time, pick up fuel to refill it. When you run out, the game is over.
