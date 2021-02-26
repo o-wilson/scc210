@@ -402,11 +402,14 @@ public class FullThrottle {
             road.setRoadSection(RoadSection.YELLOW);
         if (Input.getKeyDown(Key.NUM3))
             road.setRoadSection(RoadSection.DIRT);
-
-        if (Input.getKeyDown(Key.LEFT))
-            fuelBar.addToValue(-10);
-        if (Input.getKeyDown(Key.RIGHT))
-            fuelBar.addToValue(10);
+        if (Input.getKey(Key.UP))
+            gameManager.movePlayer(new Vector2f(0,-0.99f));
+        if (Input.getKey(Key.DOWN))
+            gameManager.movePlayer(new Vector2f(0,0.99f));
+        if (Input.getKey(Key.LEFT))
+            gameManager.movePlayer(new Vector2f(-0.99f,0));
+        if (Input.getKey(Key.RIGHT))
+            gameManager.movePlayer(new Vector2f(0.99f,0));
             
         if (Input.getKeyDown(Key.P))
             if (gameManager.isPaused())

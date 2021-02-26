@@ -120,8 +120,7 @@ public final class GameManager implements Updatable, Drawable {
 
         float pX = playerPos.x;
         float pY = playerPos.y;
-
-        if (playerPos.x < 0)
+                if (playerPos.x < 0)
             pX = 0;
         else if (playerPos.x > FullThrottle.WINDOW_WIDTH - player.getSize().x)
             pX = FullThrottle.WINDOW_WIDTH - player.getSize().x;
@@ -130,12 +129,12 @@ public final class GameManager implements Updatable, Drawable {
             pY = road.getTopEdge();
         else if (playerPos.y > road.getBottomEdge() - player.getSize().y)
             pY = road.getBottomEdge() - player.getSize().y;
-
         player.setPosition(new Vector2f(pX, pY));
     }
 
     @Override
     public void update() {
+        movePlayer(new Vector2f(-0.2222f,0));
         if (currentGameState == GameState.MAIN_MENU) {
             road.setSpeed(roadSpeedFunction(playingTime));
         } else if (currentGameState == GameState.GAMEPLAY) {
