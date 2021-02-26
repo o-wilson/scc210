@@ -139,7 +139,45 @@ public final class GameManager implements Updatable, Drawable {
             road.setSpeed(roadSpeedFunction(playingTime));
         } else if (currentGameState == GameState.GAMEPLAY) {
             playingTime += TimeManager.deltaTime();
+            if (!paused) {
+                road.update();
+                playingTime += TimeManager.deltaTime();
+                if (playingTime - player.getShiftStart() >= 3){
+                    player.setShifted(false);
+                }
+                if (player.isActive()) {
+                    Vector2f moveDirection = Vector2f.ZERO;
 
+                    if (Input.getKey(Key.LSHIFT) && player.getShifted() == false){
+                        player.setSlam(true);
+                        if (Input.getKey(Key.A))
+                            moveDirection = Vector2f.add(moveDirection, new Vector2f(-20, 0));
+                        else if (Input.getKey(Key.D))
+                            moveDirection = Vector2f.add(moveDirection, new Vector2f(20, 0));
+                        if (Input.getKey(Key.W))
+                            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, -20));
+                        else if (Input.getKey(Key.S))
+                            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, 20));
+                        player.setShifted(true);
+                        player.setShiftStart(playingTime);
+                    }
+                    else{
+                        player.setSlam(false);
+                        if (Input.getKey(Key.A))
+                            moveDirection = Vector2f.add(moveDirection, new Vector2f(-1, 0));
+                        else if (Input.getKey(Key.D))
+                            moveDirection = Vector2f.add(moveDirection, new Vector2f(1, 0));
+                        if (Input.getKey(Key.W))
+                            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, -1));
+                        else if (Input.getKey(Key.S))
+                            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, 1));
+                    }
+                    
+
+                    movePlayer(moveDirection);
+                }
+            
+            }
 
 
             Vector2f moveDirection = Vector2f.ZERO;
@@ -158,14 +196,18 @@ public final class GameManager implements Updatable, Drawable {
 
 
             if (road.isPlayerColliding(player.getBounds())) {
-                pause();
-                healthAlertAnim.restart();
-                healthAlertAnim.play();
-                int health = healthManager.removeHealth();
-                if (health == 0) {
-                    gameOver();
-                    return;
+                if (!player.getSlam())
+                {
+                    pause();
+                    healthAlertAnim.restart();
+                    healthAlertAnim.play();
+                    int health = healthManager.removeHealth();
+                    if (health == 0) {
+                        gameOver();
+                        return;
+                    }
                 }
+                
             }
 
 
