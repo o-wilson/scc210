@@ -27,6 +27,7 @@ import fullthrottle.gfx.Animator;
 import fullthrottle.gfx.FTTexture;
 import fullthrottle.gfx.ParallaxBackground;
 import fullthrottle.gfx.ParallaxBackground.Direction;
+import fullthrottle.sfx.FTMusic;
 import fullthrottle.gfx.Renderer;
 import fullthrottle.gfx.SpriteSequence;
 import fullthrottle.gfx.Spritesheet;
@@ -61,6 +62,7 @@ public class FullThrottle {
     public ProgressBar loadingBar;
 
     // Menu
+    private FTMusic music= new FTMusic();
     public UISprite title;
     public Button settingsButton, playButton, highScoreButton;
     public ParallaxBackground background;
@@ -135,7 +137,7 @@ public class FullThrottle {
         }
 
         start();
-
+        music.play_music("./res/Music/Theme_3.ogg");
         fpsCount = new Text("60 FPS", UI.DEFAULT_UI_FONT);
         fpsCount.setColor(Color.RED);
         fpsCount.setPosition(1150, 10);
@@ -382,10 +384,7 @@ public class FullThrottle {
         // Game Over
         Renderer.addDrawable(gameOverText);
         Renderer.addDrawable(nameInput, -100);
-        Renderer.addDrawable(mainMenuButton, -100);
-        Renderer.addDrawable(submitScoreButton, -100);
-        Renderer.addDrawable(playAgainButton, -100);
-        
+        Renderer.addDrawable(mainMenuButton, -100);    
         // Start the game manager
         gameManager = new GameManager(this);
         updatables.add(gameManager);

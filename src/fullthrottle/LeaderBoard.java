@@ -3,6 +3,7 @@ package fullthrottle;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jsfml.audio.Music;
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.PrimitiveType;
@@ -16,6 +17,7 @@ import org.jsfml.graphics.VertexArray;
 import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 
+import fullthrottle.sfx.FTMusic;
 import fullthrottle.gfx.FTTexture;
 import fullthrottle.ui.Button;
 import fullthrottle.ui.Button.ActionType;
@@ -47,6 +49,8 @@ public final class LeaderBoard extends UISprite {
     private float scale;
 
     private Vector2f[] textPositions;
+
+    private FTMusic music= new FTMusic();
 
     public LeaderBoard () {
         super(LEADERBOARD_TEXTURE);
