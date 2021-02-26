@@ -149,6 +149,7 @@ public final class GameManager implements Updatable, Drawable {
                     Vector2f moveDirection = Vector2f.ZERO;
 
                     if (Input.getKey(Key.LSHIFT) && player.getShifted() == false){
+                        player.setSlam(true);
                         if (Input.getKey(Key.A))
                             moveDirection = Vector2f.add(moveDirection, new Vector2f(-20, 0));
                         else if (Input.getKey(Key.D))
@@ -161,6 +162,7 @@ public final class GameManager implements Updatable, Drawable {
                         player.setShiftStart(playingTime);
                     }
                     else{
+                        player.setSlam(false);
                         if (Input.getKey(Key.A))
                             moveDirection = Vector2f.add(moveDirection, new Vector2f(-1, 0));
                         else if (Input.getKey(Key.D))
@@ -175,7 +177,7 @@ public final class GameManager implements Updatable, Drawable {
                     movePlayer(moveDirection);
                 }
             
-        }
+            }
 
 
             Vector2f moveDirection = Vector2f.ZERO;
@@ -194,14 +196,18 @@ public final class GameManager implements Updatable, Drawable {
 
 
             if (road.isPlayerColliding(player.getBounds())) {
-                pause();
-                healthAlertAnim.restart();
-                healthAlertAnim.play();
-                int health = healthManager.removeHealth();
-                if (health == 0) {
-                    gameOver();
-                    return;
+                if (!player.getSlam())
+                {
+                    pause();
+                    healthAlertAnim.restart();
+                    healthAlertAnim.play();
+                    int health = healthManager.removeHealth();
+                    if (health == 0) {
+                        gameOver();
+                        return;
+                    }
                 }
+                
             }
 
 

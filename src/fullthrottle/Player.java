@@ -24,6 +24,7 @@ public class Player implements Drawable {
     private boolean bVisible;
     private boolean active;
     private boolean shifted;
+    private boolean slam;
 
     private FloatRect bounds;
 
@@ -36,6 +37,7 @@ public class Player implements Drawable {
         resetPosition();
         bVisible = true;
         shifted = false;
+        slam = false;
         shiftStart = 0;
         Spritesheet carSheet = new Spritesheet(
             new FTTexture("./res/Car.png"),
@@ -106,6 +108,14 @@ public class Player implements Drawable {
 
     public boolean getShifted() {
         return shifted;
+    }
+
+    public void setSlam(boolean slm) {
+        this.slam = slm;
+    }
+
+    public boolean getSlam() {
+        return slam;
     }
 
     public void setShiftStart(float shift) {
