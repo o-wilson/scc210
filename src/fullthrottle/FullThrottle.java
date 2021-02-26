@@ -53,7 +53,8 @@ public class FullThrottle {
 
     private Text fpsCount;
     private boolean showFps = false;
-
+    private int score = 0;
+    private double score_mult = 1;
     private static GameManager gameManager;
 
     // Loading screen
@@ -394,6 +395,18 @@ public class FullThrottle {
     private void update() {
         for (Updatable u : updatables) {
             u.update();
+        }
+
+        score += 5*score_mult;
+        if (score==3000*score_mult*score_mult){
+            road.setRoadSection(RoadSection.WHITE);
+        }
+        if (score==6000*score_mult*score_mult){
+            road.setRoadSection(RoadSection.YELLOW);
+        }
+        if (score==9000*score_mult*score_mult){
+            road.setRoadSection(RoadSection.DIRT);
+            score_mult = score_mult *3;
         }
 
         if (Input.getKeyDown(Key.NUM1))
