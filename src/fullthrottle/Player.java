@@ -23,16 +23,20 @@ public class Player implements Drawable {
 
     private boolean bVisible;
     private boolean active;
+    private boolean shifted;
 
     private FloatRect bounds;
 
     private float scale;
+    private float shiftStart;
 
     public Player() {
         this.scale = 2;
 
         resetPosition();
         bVisible = true;
+        shifted = false;
+        shiftStart = 0;
         Spritesheet carSheet = new Spritesheet(
             new FTTexture("./res/Car.png"),
             new Vector2i(32, 32)
@@ -94,6 +98,22 @@ public class Player implements Drawable {
 
     public Vector2f getPosition() {
         return position;
+    }
+
+    public void setShifted(boolean shift) {
+        this.shifted = shift;
+    }
+
+    public boolean getShifted() {
+        return shifted;
+    }
+
+    public void setShiftStart(float shift) {
+        this.shiftStart = shift;
+    }
+
+    public float getShiftStart() {
+        return shiftStart;
     }
 
     public Vector2f getSize() {
