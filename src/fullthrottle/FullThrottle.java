@@ -27,6 +27,7 @@ import fullthrottle.gfx.Animator;
 import fullthrottle.gfx.FTTexture;
 import fullthrottle.gfx.ParallaxBackground;
 import fullthrottle.gfx.ParallaxBackground.Direction;
+import fullthrottle.sfx.FTMusic;
 import fullthrottle.gfx.Renderer;
 import fullthrottle.gfx.SpriteSequence;
 import fullthrottle.gfx.Spritesheet;
@@ -61,6 +62,7 @@ public class FullThrottle {
     public ProgressBar loadingBar;
 
     // Menu
+    private FTMusic music= new FTMusic();
     public UISprite title;
     public Button settingsButton, playButton, highScoreButton;
     public ParallaxBackground background;
@@ -135,7 +137,7 @@ public class FullThrottle {
         }
 
         start();
-
+        music.play_music("./res/Music/Theme_3.ogg");
         fpsCount = new Text("60 FPS", UI.DEFAULT_UI_FONT);
         fpsCount.setColor(Color.RED);
         fpsCount.setPosition(1150, 10);
@@ -382,10 +384,7 @@ public class FullThrottle {
         // Game Over
         Renderer.addDrawable(gameOverText);
         Renderer.addDrawable(nameInput, -100);
-        Renderer.addDrawable(mainMenuButton, -100);
-        Renderer.addDrawable(submitScoreButton, -100);
-        Renderer.addDrawable(playAgainButton, -100);
-        
+        Renderer.addDrawable(mainMenuButton, -100);    
         // Start the game manager
         gameManager = new GameManager(this);
         updatables.add(gameManager);
@@ -416,13 +415,9 @@ public class FullThrottle {
         if (Input.getKeyDown(Key.NUM3))
             road.setRoadSection(RoadSection.DIRT);
         if (Input.getKey(Key.UP))
-            gameManager.movePlayer(new Vector2f(0,-0.99f));
         if (Input.getKey(Key.DOWN))
-            gameManager.movePlayer(new Vector2f(0,0.99f));
         if (Input.getKey(Key.LEFT))
-            gameManager.movePlayer(new Vector2f(-0.99f,0));
         if (Input.getKey(Key.RIGHT))
-            gameManager.movePlayer(new Vector2f(0.99f,0));
             
         if (Input.getKeyDown(Key.P))
             if (gameManager.isPaused())

@@ -1,0 +1,2 @@
+We do not use any third party assets in this project. 
+Some inspiration for sprite work was taken from https://www.hellorf.com/image/show/642217495?source=search&term=
