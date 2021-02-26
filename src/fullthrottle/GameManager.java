@@ -86,18 +86,35 @@ public final class GameManager implements Updatable, Drawable {
             road.update();
             if (started) {
                 playingTime += TimeManager.deltaTime();
-
+                if (playingTime - player.getShiftStart() >= 3){
+                    player.setShifted(false);
+                }
                 if (player.isActive()) {
                     Vector2f moveDirection = Vector2f.ZERO;
 
-                    if (Input.getKey(Key.A))
-                        moveDirection = Vector2f.add(moveDirection, new Vector2f(-1, 0));
-                    else if (Input.getKey(Key.D))
-                        moveDirection = Vector2f.add(moveDirection, new Vector2f(1, 0));
-                    if (Input.getKey(Key.W))
-                        moveDirection = Vector2f.add(moveDirection, new Vector2f(0, -1));
-                    else if (Input.getKey(Key.S))
-                        moveDirection = Vector2f.add(moveDirection, new Vector2f(0, 1));
+                    if (Input.getKey(Key.LSHIFT) && player.getShifted() == false){
+                        if (Input.getKey(Key.A))
+                            moveDirection = Vector2f.add(moveDirection, new Vector2f(-20, 0));
+                        else if (Input.getKey(Key.D))
+                            moveDirection = Vector2f.add(moveDirection, new Vector2f(20, 0));
+                        if (Input.getKey(Key.W))
+                            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, -20));
+                        else if (Input.getKey(Key.S))
+                            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, 20));
+                        player.setShifted(true);
+                        player.setShiftStart(playingTime);
+                    }
+                    else{
+                        if (Input.getKey(Key.A))
+                            moveDirection = Vector2f.add(moveDirection, new Vector2f(-1, 0));
+                        else if (Input.getKey(Key.D))
+                            moveDirection = Vector2f.add(moveDirection, new Vector2f(1, 0));
+                        if (Input.getKey(Key.W))
+                            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, -1));
+                        else if (Input.getKey(Key.S))
+                            moveDirection = Vector2f.add(moveDirection, new Vector2f(0, 1));
+                    }
+                    
 
                     movePlayer(moveDirection);
                 }
