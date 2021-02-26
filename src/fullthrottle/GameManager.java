@@ -139,7 +139,7 @@ public final class GameManager implements Updatable, Drawable {
         if (currentGameState == GameState.MAIN_MENU) {
             road.setSpeed(roadSpeedFunction(playingTime));
         } else if (currentGameState == GameState.GAMEPLAY) {
-            fuelBar.addToValue(-50 * TimeManager.deltaTime());
+            fuelBar.addToValue(-5 * TimeManager.deltaTime());
             if(fuelBar.getCurrentValue() <= 0)
                 gameOver();
             playingTime += TimeManager.deltaTime();
