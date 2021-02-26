@@ -1,0 +1,20 @@
+This game requires use of the keyboard and mouse.
+
+
+Use the mouse to select options in the menu.
+
+To control the player use a keyboard:
+    W to go up
+    A to go left
+    S to go down
+    D to go right
+    Left shift to use the slam move
+
+The goal of the game is to avoid obstacles for as long as possible. You do this by moving your 
+player car around the road to avoid the obstacles.
+
+You can use the slam move once every three seconds. It removes any obstacles that you move into
+during its duration without you taking damage.
+
+You have 5 health. You lose health by running into obstacles. When you run out of health, the game
+is over.
