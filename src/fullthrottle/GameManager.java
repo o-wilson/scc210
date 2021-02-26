@@ -28,7 +28,7 @@ public final class GameManager implements Updatable, Drawable {
 
     // MENU
     private UISprite title;
-    private Button playButton, highScoreButton, settingsButton;
+    private Button playButton, highScoreButton, settingsButton,settingsWindow;
     private LeaderBoard leaderBoard;
     private ParallaxBackground background;
     // MENU END
@@ -255,6 +255,11 @@ public final class GameManager implements Updatable, Drawable {
 
 
         startGame();
+    }
+
+    public void showSettings() {
+    System.out.println("Show SETTINGS");
+    settingsWindow.setVisible(true);
     }
 
     public void startGame() {

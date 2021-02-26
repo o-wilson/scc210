@@ -61,7 +61,7 @@ public class FullThrottle {
 
     // Menu
     public UISprite title;
-    public Button settingsButton, playButton, highScoreButton;
+    public Button settingsButton, playButton, highScoreButton,settingsWindow;
     public ParallaxBackground background;
     public LeaderBoard leaderBoard;
 
@@ -217,13 +217,23 @@ public class FullThrottle {
      */
     private void load() {
         // Menu
-        Texture settingsT = new FTTexture("./res/Settings.png");
+        Texture settingsT = new FTTexture("./res/SettingsButton.png");
         Sprite settingsS = new Sprite(settingsT);
         settingsButton = new Button(
             new Vector2f(10, 10), new Vector2i(64, 64),
             settingsS, UI.SpriteFillMode.STRETCH
         );
+        settingsButton.addAction(this, "showSettings", ActionType.LEFT_CLICK);
         buttonManager.addObserver(settingsButton);
+
+        Texture settingsX = new FTTexture("./res/SettingsWindow.png");
+        Sprite settingsY = new Sprite(settingsX);
+        settingsWindow = new Button(
+            new Vector2f(10, 10), new Vector2i(64, 64),
+            settingsY, UI.SpriteFillMode.STRETCH
+        );
+
+
         
         playButton = new PlayButton(
             Vector2f.ZERO, new Vector2i(192, 96)
@@ -239,6 +249,8 @@ public class FullThrottle {
 
         leaderBoard = new LeaderBoard();
         leaderBoard.addCloseCallback(this, "hideLeaderBoard", ActionType.LEFT_CLICK);
+
+
 
         background = new ParallaxBackground(window, Direction.LEFT, 3000);
 
@@ -442,6 +454,10 @@ public class FullThrottle {
 
     public void settings() {
         System.out.println("Settings clicked");
+    }
+
+    public void showSettings(){
+        gameManager.showSettings();
     }
 
     public void startGame() {
