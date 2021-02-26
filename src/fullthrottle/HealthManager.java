@@ -15,6 +15,8 @@ import fullthrottle.gfx.Spritesheet;
 
 public final class HealthManager implements Drawable {
     
+    public static int STARTING_MAX_HEALTH = 5;
+
     private int maxHealth;
     private int currentHealth;
 
@@ -81,23 +83,11 @@ public final class HealthManager implements Drawable {
     private ArrayList<Heart> hearts;
 
     public HealthManager(Vector2f position, float height) {
-        maxHealth = 1;
-        currentHealth = 1;
-
         this.position = position;
         this.width = 0;
         this.height = height;
-
-        hearts = new ArrayList<>();
-        Vector2f drawPos = position;
-        Vector2f size = new Vector2f(height, height);
-        for (int i = 0; i < maxHealth; i++) {
-            Heart h = new Heart(drawPos, size);
-            hearts.add(h);
-            h.add();
-            drawPos = new Vector2f(drawPos.x + size.x, drawPos.y);
-            width += size.x;
-        }
+        
+        reset();
     }
 
     public int getCurrentHealth() {
@@ -124,6 +114,23 @@ public final class HealthManager implements Drawable {
         if (currentHealth > hearts.size() - 1) return;
         hearts.get(currentHealth).add();
         currentHealth ++;
+    }
+
+    public void reset() {
+        maxHealth = STARTING_MAX_HEALTH;
+        currentHealth = STARTING_MAX_HEALTH;
+
+        width = 0;
+        hearts = new ArrayList<>();
+        Vector2f drawPos = position;
+        Vector2f size = new Vector2f(height, height);
+        for (int i = 0; i < maxHealth; i++) {
+            Heart h = new Heart(drawPos, size);
+            hearts.add(h);
+            h.add();
+            drawPos = new Vector2f(drawPos.x + size.x, drawPos.y);
+            width += size.x;
+        }
     }
 
     @Override

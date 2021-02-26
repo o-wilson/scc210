@@ -22,10 +22,14 @@ import org.jsfml.window.WindowStyle;
 import org.jsfml.window.event.Event;
 
 import fullthrottle.Road.RoadSection;
+import fullthrottle.gfx.Animation;
+import fullthrottle.gfx.Animator;
 import fullthrottle.gfx.FTTexture;
 import fullthrottle.gfx.ParallaxBackground;
 import fullthrottle.gfx.ParallaxBackground.Direction;
 import fullthrottle.gfx.Renderer;
+import fullthrottle.gfx.SpriteSequence;
+import fullthrottle.gfx.Spritesheet;
 import fullthrottle.ui.Button;
 import fullthrottle.ui.Button.ActionType;
 import fullthrottle.ui.ButtonManager;
@@ -72,6 +76,10 @@ public class FullThrottle {
     // Game Over
     public UISprite gameOverText;
     public ReelInput nameInput;
+    public Text gameOverScoreText;
+    public Button mainMenuButton, submitScoreButton, playAgainButton;
+
+    public Animator mmbAnimator, ssbAnimator, pagAnimator;
 
     public FullThrottle() {
         init();
@@ -276,7 +284,76 @@ public class FullThrottle {
             50
         ));
 
-        nameInput = new ReelInput(5, new Vector2f((WINDOW_WIDTH - 480) / 2, 320), new Vector2f(480, 192));
+        nameInput = new ReelInput(5, new Vector2f((WINDOW_WIDTH - 480) / 2, 384), new Vector2f(480, 192));
+
+        gameOverScoreText = new Text("Score: 0000", UI.DEFAULT_UI_FONT, 48);
+
+        Vector2i gameOverButtonSize = new Vector2i(192, 96);
+        Vector2f gameOverButtonScale = Vector2f.componentwiseDiv(new Vector2f(gameOverButtonSize), new Vector2f(64, 32));
+
+        Texture mmbTexture = new FTTexture("./res/MainMenuButton.png");
+        Spritesheet mmbSheet = new Spritesheet(mmbTexture, new Vector2i(64, 32));
+        SpriteSequence mmbIdleSeq = new SpriteSequence(mmbSheet, 0, 0);
+        SpriteSequence mmbEnterSeq = new SpriteSequence(mmbSheet, 7, 13);
+        SpriteSequence mmbExitSeq = new SpriteSequence(mmbSheet, 14, 20);
+        Animation mmbIdleAnim = new Animation(mmbIdleSeq, 14, false);
+        Animation mmbEnterAnim = new Animation(mmbEnterSeq, 14, false);
+        Animation mmbExitAnim = new Animation(mmbExitSeq, 14, false);
+        mmbAnimator = new Animator();
+        mmbAnimator.addAnimation("IDLE", mmbIdleAnim);
+        mmbAnimator.addAnimation("ENTER", mmbEnterAnim);
+        mmbAnimator.addAnimation("EXIT", mmbExitAnim);
+        mmbAnimator.setCurrentAnimation("IDLE");
+        mmbAnimator.setScale(gameOverButtonScale);
+        Vector2f mmbPos = new Vector2f((WINDOW_WIDTH - (gameOverButtonSize.x * 2 + 48)) / 2, 592);
+        mainMenuButton = new Button(mmbPos, gameOverButtonSize, mmbAnimator);
+        mainMenuButton.addAction(this, "mmbEnter", ActionType.ENTER);
+        mainMenuButton.addAction(this, "mmbExit", ActionType.EXIT);
+        mainMenuButton.addAction(this, "mmbClick", ActionType.LEFT_CLICK);
+        buttonManager.addObserver(mainMenuButton);
+
+        Texture ssbTexture = new FTTexture("./res/SubmitButton.png");
+        Spritesheet ssbSheet = new Spritesheet(ssbTexture, new Vector2i(64, 32));
+        SpriteSequence ssbIdleSeq = new SpriteSequence(ssbSheet, 0, 0);
+        SpriteSequence ssbEnterSeq = new SpriteSequence(ssbSheet, 7, 13);
+        SpriteSequence ssbExitSeq = new SpriteSequence(ssbSheet, 14, 20);
+        Animation ssbIdleAnim = new Animation(ssbIdleSeq, 14, false);
+        Animation ssbEnterAnim = new Animation(ssbEnterSeq, 14, false);
+        Animation ssbExitAnim = new Animation(ssbExitSeq, 14, false);
+        ssbAnimator = new Animator();
+        ssbAnimator.addAnimation("IDLE", ssbIdleAnim);
+        ssbAnimator.addAnimation("ENTER", ssbEnterAnim);
+        ssbAnimator.addAnimation("EXIT", ssbExitAnim);
+        ssbAnimator.setCurrentAnimation("IDLE");
+        ssbAnimator.setScale(gameOverButtonScale);
+        Vector2f ssbPos = new Vector2f(500, 500);
+        submitScoreButton = new Button(ssbPos, gameOverButtonSize, ssbAnimator);
+        submitScoreButton.setHeldColor(new Color(50, 50, 50));
+        submitScoreButton.addAction(this, "ssbEnter", ActionType.ENTER, true);
+        submitScoreButton.addAction(this, "ssbExit", ActionType.EXIT, true);
+        submitScoreButton.addAction(this, "ssbClick", ActionType.LEFT_CLICK, true);
+        buttonManager.addObserver(submitScoreButton);
+
+        Texture pagTexture = new FTTexture("./res/PlayAgainButton.png");
+        Spritesheet pagSheet = new Spritesheet(pagTexture, new Vector2i(64, 32));
+        SpriteSequence pagIdleSeq = new SpriteSequence(pagSheet, 0, 0);
+        SpriteSequence pagEnterSeq = new SpriteSequence(pagSheet, 7, 13);
+        SpriteSequence pagExitSeq = new SpriteSequence(pagSheet, 14, 20);
+        Animation pagIdleAnim = new Animation(pagIdleSeq, 14, false);
+        Animation pagEnterAnim = new Animation(pagEnterSeq, 14, false);
+        Animation pagExitAnim = new Animation(pagExitSeq, 14, false);
+        pagAnimator = new Animator();
+        pagAnimator.addAnimation("IDLE", pagIdleAnim);
+        pagAnimator.addAnimation("ENTER", pagEnterAnim);
+        pagAnimator.addAnimation("EXIT", pagExitAnim);
+        pagAnimator.setCurrentAnimation("IDLE");
+        pagAnimator.setScale(gameOverButtonScale);
+        Vector2f pagPos = new Vector2f((WINDOW_WIDTH - (gameOverButtonSize.x * 2 + 48)) / 2 + 48 + gameOverButtonSize.x, 592);
+        playAgainButton = new Button(pagPos, gameOverButtonSize, pagAnimator);
+        playAgainButton.addAction(this, "pagEnter", ActionType.ENTER);
+        playAgainButton.addAction(this, "pagExit", ActionType.EXIT);
+        playAgainButton.addAction(this, "pagClick", ActionType.LEFT_CLICK);
+        buttonManager.addObserver(playAgainButton);
     }
 
     /**
@@ -304,6 +381,9 @@ public class FullThrottle {
         // Game Over
         Renderer.addDrawable(gameOverText);
         Renderer.addDrawable(nameInput, -100);
+        Renderer.addDrawable(mainMenuButton, -100);
+        Renderer.addDrawable(submitScoreButton, -100);
+        Renderer.addDrawable(playAgainButton, -100);
         
         // Start the game manager
         gameManager = new GameManager(this);
@@ -380,6 +460,60 @@ public class FullThrottle {
         playButton.setEnabled(true);
         highScoreButton.setEnabled(true);
         settingsButton.setEnabled(true);
+    }
+
+    public void mmbEnter() {
+        Animation exit = mmbAnimator.getAnimation("EXIT");
+        int startFrame = exit.getLength() - exit.getCurrentFrame() - 1;
+        mmbAnimator.getAnimation("ENTER").setCurrentFrame(startFrame);
+        mmbAnimator.setCurrentAnimation("ENTER");
+    }
+
+    public void mmbExit() {
+        Animation enter = mmbAnimator.getAnimation("ENTER");
+        int startFrame = enter.getLength() - enter.getCurrentFrame() - 1;
+        mmbAnimator.getAnimation("EXIT").setCurrentFrame(startFrame);
+        mmbAnimator.setCurrentAnimation("EXIT");
+    }
+
+    public void mmbClick() {
+        gameManager.mainMenu();
+    }
+
+    public void ssbEnter() {
+        Animation exit = ssbAnimator.getAnimation("EXIT");
+        int startFrame = exit.getLength() - exit.getCurrentFrame() - 1;
+        ssbAnimator.getAnimation("ENTER").setCurrentFrame(startFrame);
+        ssbAnimator.setCurrentAnimation("ENTER");
+    }
+
+    public void ssbExit() {
+        Animation enter = ssbAnimator.getAnimation("ENTER");
+        int startFrame = enter.getLength() - enter.getCurrentFrame() - 1;
+        ssbAnimator.getAnimation("EXIT").setCurrentFrame(startFrame);
+        ssbAnimator.setCurrentAnimation("EXIT");
+    }
+
+    public void ssbClick() {
+        gameManager.submitScore();
+    }
+
+    public void pagEnter() {
+        Animation exit = pagAnimator.getAnimation("EXIT");
+        int startFrame = exit.getLength() - exit.getCurrentFrame() - 1;
+        pagAnimator.getAnimation("ENTER").setCurrentFrame(startFrame);
+        pagAnimator.setCurrentAnimation("ENTER");
+    }
+
+    public void pagExit() {
+        Animation enter = pagAnimator.getAnimation("ENTER");
+        int startFrame = enter.getLength() - enter.getCurrentFrame() - 1;
+        pagAnimator.getAnimation("EXIT").setCurrentFrame(startFrame);
+        pagAnimator.setCurrentAnimation("EXIT");
+    }
+
+    public void pagClick() {
+        gameManager.playAgain();
     }
 
     public static void main(String[] args) {

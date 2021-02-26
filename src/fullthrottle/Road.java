@@ -433,6 +433,11 @@ public final class Road implements Drawable, Updatable {
         this.generateObstacles = b;
     }
 
+    public void clearObstacles() {
+        for (ArrayList<Obstacle> l : obstacles.values())
+            l.clear();
+    }
+
     public boolean isPlayerColliding(FloatRect playerBounds) {
         ArrayList<Integer> playerLanes = new ArrayList<>();
         for (int i = 0; i < lanes; i++) {

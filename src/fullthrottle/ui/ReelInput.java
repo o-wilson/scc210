@@ -2,10 +2,12 @@ package fullthrottle.ui;
 
 import java.util.ArrayList;
 
+import org.jsfml.graphics.Color;
 import org.jsfml.graphics.Drawable;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
+import org.jsfml.graphics.Text;
 import org.jsfml.graphics.Texture;
 import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
@@ -26,6 +28,8 @@ public class ReelInput implements Drawable {
         private Button up, down;
 
         private Vector2f position, size;
+
+        private Text letter;
 
         public Reel(
             Vector2f position, Vector2f size,
@@ -63,6 +67,16 @@ public class ReelInput implements Drawable {
             down = new Button(Vector2f.add(downPos, position), buttonSize);
             down.addAction(this, "down", ActionType.LEFT_CLICK);
             ButtonManager.getInstance().addObserver(down);
+
+            int fontSize = (int)size.y / 2;
+            letter = new Text(((char)currentValue) + "", UI.DEFAULT_UI_FONT, fontSize);
+            letter.setColor(new Color(0xfb, 0xf2, 0x36));
+            float heightOffset = fontSize - letter.getGlobalBounds().height;
+            float drawX = (size.x - letter.getGlobalBounds().width) / 2f;
+            float drawY = (size.y - letter.getGlobalBounds().height) / 2f;
+            drawY -= heightOffset;
+            Vector2f drawPos = Vector2f.add(position, new Vector2f(drawX, drawY));
+            letter.setPosition(drawPos);
         }
 
         public void up() {
@@ -70,14 +84,15 @@ public class ReelInput implements Drawable {
             if (currentValue < minAscii)
                 currentValue = maxAscii;
 
-            System.out.print((char)currentValue);
+            letter.setString((char)currentValue + "");
         }
 
         public void down() {
             currentValue++;
             if (currentValue > maxAscii)
                 currentValue = minAscii;
-            System.out.print((char)currentValue);
+            
+            letter.setString((char)currentValue + "");
         }
 
         public char getValue() {
@@ -98,6 +113,7 @@ public class ReelInput implements Drawable {
                 )
             );
             s.draw(arg0, arg1);
+            letter.draw(arg0, arg1);
         }
     }
 
@@ -123,7 +139,7 @@ public class ReelInput implements Drawable {
                 )
             )
         );
-        System.out.println(reelSize.x + "," + reelSize.y);
+        
         for (int i = 0; i < length; i++) {
             Reel r = new Reel(
                 new Vector2f(

@@ -31,7 +31,7 @@ public class Player implements Drawable {
     public Player() {
         this.scale = 2;
 
-        position = new Vector2f(40, 490);
+        resetPosition();
         bVisible = true;
         Spritesheet carSheet = new Spritesheet(
             new FTTexture("./res/Car.png"),
@@ -54,6 +54,10 @@ public class Player implements Drawable {
             30 * scale,
             20 * scale
         );
+    }
+
+    public void resetPosition() {
+        position = new Vector2f(32, 480);
     }
 
     @Override

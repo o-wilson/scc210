@@ -1,8 +1,10 @@
 package fullthrottle;
 
+import org.jsfml.graphics.Color;
 import org.jsfml.graphics.Drawable;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
+import org.jsfml.graphics.Text;
 import org.jsfml.graphics.Texture;
 import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
@@ -17,6 +19,7 @@ import fullthrottle.ui.Button;
 import fullthrottle.ui.ProgressBar;
 import fullthrottle.ui.ReelInput;
 import fullthrottle.ui.UISprite;
+import fullthrottle.util.HighScoreManager;
 import fullthrottle.util.Input;
 import fullthrottle.util.TimeManager;
 import fullthrottle.util.Updatable;
@@ -42,8 +45,11 @@ public final class GameManager implements Updatable, Drawable {
     // UPGRADES END
 
     // GAME OVER
+    private boolean startGameOver;
     private UISprite gameOverText;
     private ReelInput nameInput;
+    private Text gameOverScoreText;
+    private Button mainMenuButton, submitScoreButton, playAgainButton;
     // GAME OVER END
 
     private boolean paused;
@@ -96,6 +102,10 @@ public final class GameManager implements Updatable, Drawable {
         // Game Over
         this.gameOverText = game.gameOverText;
         this.nameInput = game.nameInput;
+        this.gameOverScoreText = game.gameOverScoreText;
+        this.mainMenuButton = game.mainMenuButton;
+        this.submitScoreButton = game.submitScoreButton;
+        this.playAgainButton = game.playAgainButton;
 
         currentGameState = GameState.MAIN_MENU;
 
@@ -166,8 +176,19 @@ public final class GameManager implements Updatable, Drawable {
 
         } else if (currentGameState == GameState.GAME_OVER) {
             playingTime += TimeManager.deltaTime();
-            if (playingTime > 2) {
+            if (playingTime > 2 && startGameOver) {
+                startGameOver = false;
                 nameInput.setVisible(true);
+
+                mainMenuButton.setVisible(true);
+                mainMenuButton.setEnabled(true);
+                submitScoreButton.setVisible(true);
+                submitScoreButton.setEnabled(true);
+                playAgainButton.setVisible(true);
+                playAgainButton.setEnabled(true);
+                mainMenuButton.setDefaultColor(Color.WHITE);
+                submitScoreButton.setDefaultColor(Color.WHITE);
+                playAgainButton.setDefaultColor(Color.WHITE);
             }
         }
 
@@ -187,7 +208,7 @@ public final class GameManager implements Updatable, Drawable {
             healthManager.draw(arg0, arg1);
             healthAlertAnim.draw(arg0, arg1);
         } else if (currentGameState == GameState.GAME_OVER) {
-            
+            healthAlertAnim.draw(arg0, arg1);
         }
     }
 
@@ -207,21 +228,50 @@ public final class GameManager implements Updatable, Drawable {
         gameOverText.setVisible(false);
         nameInput.setVisible(false);
         fuelBar.setVisible(false);
+
+        mainMenuButton.setVisible(false);
+        mainMenuButton.setEnabled(false);
+        submitScoreButton.setVisible(false);
+        submitScoreButton.setEnabled(false);
+        playAgainButton.setVisible(false);
+        playAgainButton.setEnabled(false);
+
+        road.clearObstacles();
+        healthManager.reset();
+    }
+
+    public void playAgain() {
+        road.clearObstacles();
+        score = 0;
+        healthManager.reset();
+        gameOverText.fadeOut(.6f);
+        nameInput.setVisible(false);
+        mainMenuButton.setVisible(false);
+        submitScoreButton.setVisible(false);
+        playAgainButton.setVisible(false);
+        mainMenuButton.setEnabled(false);
+        submitScoreButton.setEnabled(false);
+        playAgainButton.setEnabled(false);
+
+
+        startGame();
     }
 
     public void startGame() {
-        if (currentGameState == GameState.MAIN_MENU) {
-            fuelBar.setVisible(true);
-            playButton.setVisible(false);
-            playButton.setEnabled(false);
-            highScoreButton.setVisible(false);
-            highScoreButton.setEnabled(false);
-            settingsButton.setVisible(false);
-            settingsButton.setEnabled(false);
+        if (currentGameState == GameState.MAIN_MENU)
             title.fadeOut(.6f);
-            leaderBoard.setVisible(false);
-        }
+        fuelBar.setVisible(true);
+        playButton.setVisible(false);
+        playButton.setEnabled(false);
+        highScoreButton.setVisible(false);
+        highScoreButton.setEnabled(false);
+        settingsButton.setVisible(false);
+        settingsButton.setEnabled(false);
+        leaderBoard.setVisible(false);
         currentGameState = GameState.GAMEPLAY;
+        player.resetPosition();
+        player.setVisible(true);
+        
 
         road.generateObstacles(true);
         playingTime = 0;
@@ -240,6 +290,8 @@ public final class GameManager implements Updatable, Drawable {
 
         player.setVisible(false);
         fuelBar.setVisible(false);
+        startGameOver = true;
+
         gameOverText.fadeIn(2);
         playingTime = 0;
     }
@@ -258,5 +310,11 @@ public final class GameManager implements Updatable, Drawable {
 
     public void play() {
         this.paused = false;
+    }
+
+    public void submitScore() {
+        HighScoreManager.addHighScore(nameInput.getString(), (int)score);
+        submitScoreButton.setEnabled(false);
+        submitScoreButton.setDefaultColor(new Color(120, 120, 120));
     }
 }
