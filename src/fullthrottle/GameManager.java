@@ -10,6 +10,7 @@ import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 import org.jsfml.window.Keyboard.Key;
 
+import fullthrottle.Pickup.PickupType;
 import fullthrottle.gfx.Animation;
 import fullthrottle.gfx.FTTexture;
 import fullthrottle.gfx.ParallaxBackground;
@@ -138,6 +139,9 @@ public final class GameManager implements Updatable, Drawable {
         if (currentGameState == GameState.MAIN_MENU) {
             road.setSpeed(roadSpeedFunction(playingTime));
         } else if (currentGameState == GameState.GAMEPLAY) {
+            fuelBar.addToValue(-50 * TimeManager.deltaTime());
+            if(fuelBar.getCurrentValue() <= 0)
+                gameOver();
             playingTime += TimeManager.deltaTime();
             if (!paused) {
                 road.update();
@@ -148,7 +152,7 @@ public final class GameManager implements Updatable, Drawable {
                 if (player.isActive()) {
                     Vector2f moveDirection = Vector2f.ZERO;
 
-                    if (Input.getKey(Key.LSHIFT) && player.getShifted() == false){
+                    if (Input.getKey(Key.SPACE) && player.getShifted() == false){
                         player.setSlam(true);
                         if (Input.getKey(Key.A))
                             moveDirection = Vector2f.add(moveDirection, new Vector2f(-20, 0));
@@ -208,6 +212,13 @@ public final class GameManager implements Updatable, Drawable {
                     }
                 }
                 
+            }
+
+            Pickup p = road.isPlayerOnPickup(player.getBounds());
+            if (p != null) {
+                if (p.getType() == PickupType.FUEL) {
+                    fuelBar.addToValue(10);
+                }
             }
 
 
@@ -294,13 +305,16 @@ public final class GameManager implements Updatable, Drawable {
         submitScoreButton.setEnabled(false);
         playAgainButton.setEnabled(false);
 
+        fuelBar.setToMax();
 
         startGame();
     }
 
     public void startGame() {
-        if (currentGameState == GameState.MAIN_MENU)
+        if (currentGameState == GameState.MAIN_MENU) {
             title.fadeOut(.6f);
+            fuelBar.setToMax();
+        }
         fuelBar.setVisible(true);
         playButton.setVisible(false);
         playButton.setEnabled(false);

@@ -16,6 +16,7 @@ import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 
 import fullthrottle.Obstacle.ObstacleType;
+import fullthrottle.Pickup.PickupType;
 import fullthrottle.gfx.Animation;
 import fullthrottle.gfx.FTTexture;
 import fullthrottle.util.TimeManager;
@@ -71,10 +72,13 @@ public final class Road implements Drawable, Updatable {
     private Vector2f origin;
 
     private HashMap<Integer, ArrayList<Obstacle>> obstacles;
+    private HashMap<Integer, ArrayList<Pickup>> pickups;
 
     private Animation explosion;
 
     private ArrayList<ObstacleType> currentAllowedObstacles;
+
+    private ArrayList<PickupType> pickupTypes;
 
     /**
      * Holds information about the structure and sections of the
@@ -158,8 +162,10 @@ public final class Road implements Drawable, Updatable {
 
         columns = new ArrayList<>();
         obstacles = new HashMap<>();
+        pickups = new HashMap<>();
         for (int i = 0; i < lanes; i++) {
             obstacles.put(i, new ArrayList<Obstacle>());
+            pickups.put(i, new ArrayList<Pickup>());
         }
         currentAllowedObstacles = ObstacleType.getObstaclesForSection(rS);
 
@@ -167,6 +173,8 @@ public final class Road implements Drawable, Updatable {
         explosion.scale(new Vector2f(ROAD_TILE_SCALE, ROAD_TILE_SCALE));
         explosion.restart();
         explosion.pause();
+
+        pickupTypes = PickupType.getAll();
     }
 
     public float getTopEdge() {
@@ -270,6 +278,15 @@ public final class Road implements Drawable, Updatable {
         obstacles.get(lane).add(o);
     }
 
+    private void generatePickup(int column) {
+        PickupType type = pickupTypes.get(rand.nextInt(pickupTypes.size()));
+
+        float scaleFactor = (ROAD_TILE_SCALE * ROAD_TILE_DIMENSIONS.y) / Pickup.PICKUP_SPRITE_SIZE.y;
+        int lane = rand.nextInt(lanes);
+        Pickup p = new Pickup(type, new Vector2f(column * ROAD_TILE_DIMENSIONS.x * ROAD_TILE_SCALE, getLanePos(lane)), scaleFactor);
+        pickups.get(lane).add(p);
+    }
+
     @Override
     public void draw(RenderTarget arg0, RenderStates arg1) {
         if (!bVisible) return;
@@ -322,6 +339,13 @@ public final class Road implements Drawable, Updatable {
         }
         obVA.draw(arg0, obRS);
 
+        VertexArray pVA = new VertexArray(PrimitiveType.QUADS);
+        RenderStates pRS = new RenderStates(arg1, Pickup.PICKUP_SPRITE_SHEET);
+        for (ArrayList<Pickup> l : pickups.values())
+            for (Pickup p : l)
+                pVA.addAll(p.getVertexArray());
+        pVA.draw(arg0, pRS);
+
         explosion.draw(arg0, arg1);
         if (explosion.getCurrentFrame() == explosion.getLength() - 1)
             FullThrottle.getGameManager().play();
@@ -348,6 +372,10 @@ public final class Road implements Drawable, Updatable {
             if (rand.nextInt(3) == 1 && generateObstacles) {
                 generateObstacle(columns.size());
             }
+
+            if (rand.nextInt(5) == 1 && generateObstacles) {
+                generatePickup(columns.size());
+            } 
         }
 
         if (origin.x < vBounds.left - tileWidth) {
@@ -376,6 +404,16 @@ public final class Road implements Drawable, Updatable {
 
                 if (!o.isOnScreen())
                     offscreen.add(o);
+            }
+            l.removeAll(offscreen);
+        }
+
+        for (ArrayList<Pickup> l : pickups.values()) {
+            ArrayList<Pickup> offscreen = new ArrayList<>();
+            for (Pickup p : l) {
+                p.move(dX);
+                if (!p.isOnScreen())
+                    offscreen.add(p);
             }
             l.removeAll(offscreen);
         }
@@ -483,6 +521,45 @@ public final class Road implements Drawable, Updatable {
         }
 
         return collision;
+    }
+
+    public Pickup isPlayerOnPickup(FloatRect playerBounds) {
+        ArrayList<Integer> playerLanes = new ArrayList<>();
+        for (int i = 0; i < lanes; i++) {
+            float top = getTopEdge() + (i * ROAD_TILE_DIMENSIONS.y * ROAD_TILE_SCALE);
+            float bottom = getTopEdge() + ((i + 1) * ROAD_TILE_DIMENSIONS.y * ROAD_TILE_SCALE);
+            if (playerBounds.top >= top && playerBounds.top <= bottom) {
+                playerLanes.add(i);
+                continue;
+            }
+            float pBottom = playerBounds.top + playerBounds.height;
+            if (pBottom >= top && pBottom <= bottom) {
+                playerLanes.add(i);
+                continue;
+            }
+
+            if (playerLanes.size() != 0)
+                if (i > playerLanes.get(playerLanes.size() - 1) + 1)
+                    break;
+        }
+        if (playerLanes.size() == 2 && playerLanes.get(0) + 1 != playerLanes.get(1))
+            playerLanes.add(1, playerLanes.get(0) + 1);
+
+        boolean collision = false;
+        Pickup collider = null;
+        for (int i : playerLanes) {
+            for (Pickup p : pickups.get(i)) {
+                collision = p.intersects(playerBounds);
+                if (collision) {
+                    obstacles.get(i).remove(p);
+                    collider = p;
+                    break;
+                }
+            }
+            if (collision) break;
+        }
+
+        return collider;
     }
 
     private class InvalidLaneCountException extends RuntimeException {

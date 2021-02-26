@@ -238,6 +238,10 @@ public class ProgressBar implements Drawable, Updatable {
         return currentValue;
     }
 
+    public void setToMax() {
+        this.currentValue = this.maxValue;
+    }
+
     @Override
     public void update() {
         if (!lerpUpdate) {
