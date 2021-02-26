@@ -561,7 +561,7 @@ public final class Road implements Drawable, Updatable {
             for (Pickup p : pickups.get(i)) {
                 collision = p.intersects(playerBounds);
                 if (collision) {
-                    obstacles.get(i).remove(p);
+                    pickups.get(i).remove(p);
                     collider = p;
                     break;
                 }

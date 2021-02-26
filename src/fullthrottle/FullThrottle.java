@@ -329,7 +329,7 @@ public class FullThrottle {
         ssbAnimator.addAnimation("EXIT", ssbExitAnim);
         ssbAnimator.setCurrentAnimation("IDLE");
         ssbAnimator.setScale(gameOverButtonScale);
-        Vector2f ssbPos = new Vector2f(500, 500);
+        Vector2f ssbPos = new Vector2f(900, 432);
         submitScoreButton = new Button(ssbPos, gameOverButtonSize, ssbAnimator);
         submitScoreButton.setHeldColor(new Color(50, 50, 50));
         submitScoreButton.addAction(this, "ssbEnter", ActionType.ENTER, true);
@@ -368,7 +368,7 @@ public class FullThrottle {
         // Menu
         title.setPosition(title.getGlobalBounds().left, 50);
         Renderer.addDrawable(title);
-        Renderer.addDrawable(settingsButton, -50);
+        // Renderer.addDrawable(settingsButton, -50);
         Renderer.addDrawable(playButton, -50);
         Renderer.addDrawable(highScoreButton, -50);
         Renderer.addDrawable(background, 1000);
@@ -384,7 +384,11 @@ public class FullThrottle {
         // Game Over
         Renderer.addDrawable(gameOverText);
         Renderer.addDrawable(nameInput, -100);
-        Renderer.addDrawable(mainMenuButton, -100);    
+        Renderer.addDrawable(mainMenuButton, -100);
+        Renderer.addDrawable(playAgainButton, -100);
+        Renderer.addDrawable(submitScoreButton, -100);
+
+
         // Start the game manager
         gameManager = new GameManager(this);
         updatables.add(gameManager);
