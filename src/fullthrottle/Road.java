@@ -47,6 +47,8 @@ public final class Road implements Drawable, Updatable {
      */
     public static RoadSection DEFAULT_ROAD_SECTION = RoadSection.WHITE;
 
+    public static int MAX_OBSTACLES = 15;
+
     /**
      * Used to calculate texture coordinates based on
      * the top left coordinate; vertex order: TL TR BR BL
@@ -270,6 +272,14 @@ public final class Road implements Drawable, Updatable {
         obstacles.get(lane).add(o);
     }
 
+    private int numObstacles() {
+        int count = 0;
+        for (ArrayList<Obstacle> l : obstacles.values())
+            count += l.size();
+
+        return count;
+    }
+
     @Override
     public void draw(RenderTarget arg0, RenderStates arg1) {
         if (!bVisible) return;
@@ -345,7 +355,7 @@ public final class Road implements Drawable, Updatable {
         float tileWidth = ROAD_TILE_DIMENSIONS.x * ROAD_TILE_SCALE;
         while ((columns.size() - 1) * tileWidth < vBounds.width) {
             generateColumn();
-            if (rand.nextInt(3) == 1 && generateObstacles) {
+            if (rand.nextInt(3) == 1 && generateObstacles && numObstacles() < MAX_OBSTACLES){
                 generateObstacle(columns.size());
             }
         }
