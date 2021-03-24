@@ -1,5 +1,6 @@
 # ---> Java
 *.class
+*.jar
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
@@ -16,3 +17,9 @@ hs_err_pid*
 javadoc
 sources.txt
 out
+.highscores
+.vscode
+.gitignore
+res/aseprite
+*.aseprite
+res/IndividualObstacles

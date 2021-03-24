@@ -52,8 +52,6 @@ public final class PlayButton extends Button {
         this.addAction(this, "playButtonLeftClick", ActionType.LEFT_CLICK);
         this.addAction(this, "playButtonEnter", ActionType.ENTER);
         this.addAction(this, "playButtonExit", ActionType.EXIT);
-        
-        Renderer.addDrawable(this);
     }
 
     public void playButtonEnter() {
@@ -71,6 +69,6 @@ public final class PlayButton extends Button {
     }
 
     public void playButtonLeftClick() {
-        System.out.println("Play Button pressed");
+        // System.out.println("Play Button pressed");
     }
 }

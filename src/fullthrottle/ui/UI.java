@@ -25,7 +25,11 @@ public final class UI {
     );
 
     public static Font DEFAULT_UI_FONT = new FTFont(
-        "./res/FreeSans.ttf"
+        "./res/ThaleahFat.ttf"
+    );
+
+    public static Texture UPGRADE_MARKER_TEXTURE = new FTTexture(
+        "./res/shop/UpgradeMarkers.png"
     );
 
     /**
